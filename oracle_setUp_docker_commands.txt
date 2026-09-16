@@ -1,0 +1,38 @@
+naga@nagarasu-296B894:/mnt/c/Users/NagarajanSubramani$ history
+    1  exit
+    2  which -a echo
+    3  sudo -l "/mnt/c/Program Files/Rancher Desktop/resources/resources/linux/bin//docker" /usr/bin/docker
+    4  which -a docker
+    5  docker --version
+    6  docker images
+    7  wsl -l
+    8  wsl --install
+    9  which -a docker
+   10  bash
+   11  echo hllo
+   12  "/mnt/c/Program Files/Rancher Desktop/resources/resources/linux/bin//docker" --version
+   13  docker pull container-registry.oracle.com/database/free:latest
+   14  which -a docker
+   15  docker images
+   16  export DOCKER_HOST=unix:///var/run/docker.sock
+   17  docker images
+   18  export DOCKER_HOST=tcp://localhost:2375
+   19  docker images
+   20  which -a docker
+   21  docker --version
+   22  docker images
+   23  docker pull container-registry.oracle.com/database/free:latest
+   24  docker images
+   25  pwd
+   26  docker run -d --name oracle-free   -p 1521:1521 -p 5500:5500   -e ORACLE_PWD=welcome1  -v /mnt/c/oracle_data:/opt/oracle/oradata container-registry.oracle.com/database/free:latest
+   27  docker images
+   28  docker run -d --name oracle-free   -p 1521:1521 -p 5500:5500   -e ORACLE_PWD=welcome1  -v /mnt/c/oracle_data:/opt/oracle/oradata container-registry.oracle.com/database/free:latest
+   29  docke rps
+   30  docker ps
+   31  docker logs -f oracle-free
+   32  ls -ltr /opt/oracle/oradata
+   33  mkdir  -p /mnt/c/oracle_data
+   34  docker rm -f oracle-free
+   35  docker run -d --name oracle-free   -p 1521:1521 -p 5500:5500   -e ORACLE_PWD=welcome1  -v /mnt/c/oracle_data:/opt/oracle/oradata container-registry.oracle.com/database/free:latest
+   36  docker ps
+   37  history

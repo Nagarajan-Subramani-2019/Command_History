@@ -1,0 +1,3 @@
+
+ssh-keygen -t ed25519 -C "oxygenraj" -f ~/.ssh/gcp_oxygenraj_20260918
+ssh -o IdentitiesOnly=yes -i ~/.ssh/gcp_oxygenraj_20260918 oxygenraj@34.130.46.162

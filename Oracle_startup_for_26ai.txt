@@ -3,6 +3,11 @@ export ORACLE_HOME=/opt/oracle/product/26ai/dbhomeFree
 export PATH="$ORACLE_HOME/bin:$PATH"
 lsnrctl status
 
+ssh for googlecloud:
+=======================
+ssh -o IdentitiesOnly=yes -i ~/.ssh/gcp_oxygenraj_20260918 oxygenraj@34.133.246.224
+
+
 Tunneling in windows
 =======================
 NagarajanSubramani@nagarasu-296B894 MINGW64 ~
@@ -17,3 +22,50 @@ $ ssh -N \
 sqlplus in DB server:
 =========================
 sqlplus -L "sys@//$(hostname -f):1521/FREEPDB1 as sysdba"
+
+
+
+Amazon aws 
+============
+
+ssh -i "~/.ssh/amazon.pem" ec2-user@ec2-16-192-192-6.eu-north-1.compute.amazonaws.com
+
+cat amazon.pem
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAqsBv/UC2ldQG7zEZ1YEK6NUfw7Ppx9M6FaIz6ngtqLjNHdW2
+zfXpqEfoN5YIijODucQoROCKHxl9XmzHCb2bkLZIg7ZUGjSIBsedSntwJ4RHvO5f
+d8DTvAy52cvVoe5JSjtwgBJ3mOWL1mA6hPdeDX64nTLueiRFnaigQzk4tZTIhVa8
+X7wd50/D/6uEnr8F7Adl97/OHRUPBuxaQp06W4rbrqD4lx+D401m3PZhXMvthrVL
+VEJ46scWMSKm0VsZfhzpLd/YR5sPsF3wB/KIkEZmGLEBUYEv21Hdg7hJG8zqCiO4
+1cs7j3mey73XOufIGAvy8mc6MO90Hc+/YOkPxwIDAQABAoIBADQhHA+NOjDz0kok
+C2cLRnFe35u3yZ+f9RO1uXPTzNy9zqFVJcIrWXJuwY5215SZtZV5NXIRuxlThtrV
+Cs8Ge//qJqlPeM2nTAAF4RdkKBFoaR5dB/hffkTi/bpoaIhPX0CydN4kxS6ApfiE
+2FjPzH8COQqFChlwCXDgkkzzo0SL8AFllePbRndK0sSEchXgBOrwBIBjwgEDfnbF
+mtRQHa76tsv0pW0ws1kkv+ngbnweTmd3jk66EnzZ1pOaK340dM86IyHs/8wYhvll
+EBQ/oO6AzFN/28yTEw+n7OcCdqldHQUDk7x2/w4goCPraWz2iqFqnv8gndL2HwuE
+3/0AIAECgYEA2sRV4jM7CQHoqgl0B8OCpgMesGYWSx1ERZKZHvGui9R+Ey4u3F/Q
+gAB9K0Rg6Yap6KQRdU4z41R7KwDiRNCZ9UfiArTP3mPIkz9h3mKsHcM1i4C0LmYO
+9/PUC1vnfHjjUMlOWbMeJarNhL/RmWb2uGGpY/rUloRGETNnyzPjjgECgYEAx9AU
+uBHgPu7No4pxVqWSoKpN8xTiFe0Ddhrp4j094dItKDl3hH8WGL5fUTYcKwJKayul
+6WQ48gf2TXxlpzFgKzo8TZlNx2m0JgaU+Xja37gPYni26/DitzQ4+jEJOp+WtV/x
+aI1MnkW2dlD4QGHPzMUo7M7Wv0QADxAGJ/IPrccCgYEAzCmzJRk+nRdk9VtBKAW0
+Jg5/U4zSfWNg1bUMpa5TgTfcOTY+kXfx86OBLSHxd78vTmffyyQilKPBFs8KW8J6
+DEj7ih8IZ7mj9JeQVKStkFEf5YNFpI+mpIyvdbJdhPKk4j4cmuXo2qpehuclSw6m
+bkjmduIeCCKF6YOZ+DACzAECgYBlONRGK0gemXszTf78lgQhwCSc8AdYdCk8u4Wg
+RsYCkCawKeySAo9/GXHQAkliwFZS1FnIUi1G7yGnP01/1VOSkn3aEb+FNdc9LDhr
+6P14OBYTHHQOMomnpZz3ob+7Iv2GBISXIn2d8FLuvTYF54cNhROmY2IGorwk5Uk5
+Ezc+IQKBgQDAQS8+ibXwclf/Kic/suao2W8lcxR2wuZW/RDTMnCbUmiY12QmyzA7
+7Mtr1c3S1beC1S+ZjdE0vmArBpOHOsAJt/JDyZRsQPt+4xd323pp9NSKQ7Z/4tDZ
+i2I9uGz8qiG45+x9u241YCuDMD6MLzI+m7vVuNUlgPJpkGNARI1oxg==
+-----END RSA PRIVATE KEY-----
+
+
+Oracle_Cloud_machine:( key is set while creating the VM ):
+------------------------------------------------------------------------------------
+ssh -o IdentitiesOnly=yes  -i ~/.ssh/gcp_oxygenraj_20260918 opc@132.226.188.59
+ssh -o IdentitiesOnly=yes  -i ./gcp_oxygenraj_20260918 opc@132.226.188.59
+
+Tunneling from oracle_machine_for setting_db_details(from google cloud)
+--------------------------------------------------------------------------
+ssh  -i ~/.ssh/gcp_oxygenraj_20260918 -L 127.0.0.1:11521:10.128.0.3:1521 oxygenraj@34.133.246.224
+ssh -N  -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -i ~/.ssh/gcp_oxygenraj_20260918  -L 127.0.0.1:11521:10.128.0.3:1521  oxygenraj@34.133.246.224

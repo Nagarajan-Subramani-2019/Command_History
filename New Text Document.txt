@@ -1,0 +1,8 @@
+for i in 1 
+do 
+free -h
+ sudo -S echo hello |  echo 1 | sudo tee /proc/sys/vm/drop_caches
+echo 2 | sudo tee /proc/sys/vm/drop_caches
+echo 3 | sudo tee /proc/sys/vm/drop_caches
+free -h
+done 

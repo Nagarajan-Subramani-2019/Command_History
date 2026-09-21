@@ -1,13 +1,20 @@
+
+GOOGLE:
+---------
+1)
+ssh for googlecloud:
+=======================
+ssh -o IdentitiesOnly=yes -i ~/.ssh/gcp_oxygenraj_20260918 oxygenraj@34.133.246.224
+
+2)
+db config:
+===========
 sudo -iu oracle
 export ORACLE_HOME=/opt/oracle/product/26ai/dbhomeFree
 export PATH="$ORACLE_HOME/bin:$PATH"
 lsnrctl status
 
-ssh for googlecloud:
-=======================
-ssh -o IdentitiesOnly=yes -i ~/.ssh/gcp_oxygenraj_20260918 oxygenraj@34.133.246.224
-
-
+3)
 Tunneling in windows
 =======================
 NagarajanSubramani@nagarasu-296B894 MINGW64 ~
@@ -19,16 +26,24 @@ $ ssh -N \
   oxygenraj@34.133.246.224
 
 
+4)
 sqlplus in DB server:
 =========================
 sqlplus -L "sys@//$(hostname -f):1521/FREEPDB1 as sysdba"
 
 
-
+AMAZON
+--------
+1)
 Amazon aws 
 ============
 
-ssh -i "~/.ssh/amazon.pem" ec2-user@ec2-16-192-192-6.eu-north-1.compute.amazonaws.com
+Account ID
+5330-1176-6624
+Account name
+oxygenraj_aws
+
+ssh -i "amazon.pem" ec2-user@ec2-16-192-188-116.eu-north-1.compute.amazonaws.com
 
 cat amazon.pem
 -----BEGIN RSA PRIVATE KEY-----
@@ -59,7 +74,42 @@ Ezc+IQKBgQDAQS8+ibXwclf/Kic/suao2W8lcxR2wuZW/RDTMnCbUmiY12QmyzA7
 i2I9uGz8qiG45+x9u241YCuDMD6MLzI+m7vVuNUlgPJpkGNARI1oxg==
 -----END RSA PRIVATE KEY-----
 
+2)
+sqlplus in amazon :
+======================
+CLIENT_URL="https://yum.oracle.com/repo/OracleLinux/OL10/oracle/instantclient23/x86_64/getPackage"
 
+sudo dnf install -y \
+  "${CLIENT_URL}/oracle-instantclient-basic-23.26.3.0.0-1.el10.x86_64.rpm" \
+  "${CLIENT_URL}/oracle-instantclient-sqlplus-23.26.3.0.0-1.el10.x86_64.rpm"
+  
+export PATH="/usr/lib/oracle/23/client64/bin:$PATH"
+sqlplus -V
+
+
+3)
+Connecting from amazon vm to google cloud :
+----------------------------------------------------
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/gcp_oxygenraj_20260918
+
+stat -c '%a %U %n' ~/.ssh/gcp_oxygenraj_20260918
+
+4)
+Tunneling from amazon vm for setting_db_details(to google cloud)
+--------------------------------------------------------------------------
+ssh -o IdentitiesOnly=yes  -i ~/.ssh/gcp_oxygenraj_20260918   oxygenraj@34.133.246.224
+ssh -N  -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -i ~/.ssh/gcp_oxygenraj_20260918  -L 127.0.0.1:11521:10.128.0.3:1521  oxygenraj@34.133.246.224
+
+5)
+in another terminal 
+sqlplus sys/welcome1@127.0.0.1:11521/FREEPDB1 as sysdba
+
+
+
+Not working from oracle cloud 
+tunneling taking more space 
+---------------------------------------------------------------------
 Oracle_Cloud_machine:( key is set while creating the VM ):
 ------------------------------------------------------------------------------------
 ssh -o IdentitiesOnly=yes  -i ~/.ssh/gcp_oxygenraj_20260918 opc@132.226.188.59
@@ -67,5 +117,10 @@ ssh -o IdentitiesOnly=yes  -i ./gcp_oxygenraj_20260918 opc@132.226.188.59
 
 Tunneling from oracle_machine_for setting_db_details(from google cloud)
 --------------------------------------------------------------------------
-ssh  -i ~/.ssh/gcp_oxygenraj_20260918 -L 127.0.0.1:11521:10.128.0.3:1521 oxygenraj@34.133.246.224
+ssh  -i ~/.ssh/gcp_oxygenraj_20260918  oxygenraj@34.133.246.224
+
+/home/ec2-user/.ssh/aws_to_gcp.pub
+ssh  -i /home/ec2-user/.ssh/gcp_oxygenraj_20260918  oxygenraj@34.133.246.224
+
+
 ssh -N  -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -i ~/.ssh/gcp_oxygenraj_20260918  -L 127.0.0.1:11521:10.128.0.3:1521  oxygenraj@34.133.246.224

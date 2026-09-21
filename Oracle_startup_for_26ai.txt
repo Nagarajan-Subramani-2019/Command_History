@@ -12,3 +12,8 @@ $ ssh -N \
   -i ~/.ssh/gcp_oxygenraj_20260918 \
   -L 127.0.0.1:11521:10.128.0.3:1521 \
   oxygenraj@34.133.246.224
+
+
+sqlplus in DB server:
+=========================
+sqlplus -L "sys@//$(hostname -f):1521/FREEPDB1 as sysdba"

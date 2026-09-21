@@ -1,0 +1,14 @@
+sudo -iu oracle
+export ORACLE_HOME=/opt/oracle/product/26ai/dbhomeFree
+export PATH="$ORACLE_HOME/bin:$PATH"
+lsnrctl status
+
+Tunneling in windows
+=======================
+NagarajanSubramani@nagarasu-296B894 MINGW64 ~
+$ ssh -N \
+  -o IdentitiesOnly=yes \
+  -o ExitOnForwardFailure=yes \
+  -i ~/.ssh/gcp_oxygenraj_20260918 \
+  -L 127.0.0.1:11521:10.128.0.3:1521 \
+  oxygenraj@34.133.246.224

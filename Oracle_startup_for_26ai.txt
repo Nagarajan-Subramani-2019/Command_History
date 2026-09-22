@@ -137,7 +137,7 @@ nohup ssh -NT \
 tail -n 20 ~/gcp-db-tunnel.log
 
 
-sqlplus -L "sys@//127.0.0.1:11521/FREEPDB1 as sysdba"
+sqlplus sys/welcome1@127.0.0.1:11521/FREEPDB1 as sysdba
 
 
 *************************
@@ -151,3 +151,42 @@ ssh  -i /home/ec2-user/.ssh/gcp_oxygenraj_20260918  oxygenraj@34.133.246.224
 
 
 ssh -N  -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -i ~/.ssh/gcp_oxygenraj_20260918  -L 127.0.0.1:11521:10.128.0.3:1521  oxygenraj@34.133.246.224
+
+
+Tablespace and schema creation and drop :
+-----------------------------------------------
+for i in INITIAL_DB
+do
+echo $i
+sqlplus -s sys/welcome1@127.0.0.1:11521/FREEPDB1 as sysdba <<EOF
+ 
+SET HEADING OFF
+SET FEEDBACK OFF
+CREATE TABLESPACE $i DATAFILE '/opt/oracle/oradata/FREE/FREEPDB1/$i.dbf' SIZE 50M AUTOEXTEND ON MAXSIZE 100M;
+CREATE USER $i IDENTIFIED BY welcome1 DEFAULT TABLESPACE $i TEMPORARY TABLESPACE TEMP;
+ALTER USER $i QUOTA UNLIMITED ON $i;
+GRANT CREATE SESSION TO $i;
+GRANT CREATE TABLE TO $i;
+GRANT CREATE SEQUENCE TO $i;
+GRANT CREATE VIEW TO $i;
+GRANT CREATE PROCEDURE TO $i;
+GRANT CREATE SYNONYM TO $i;
+GRANT CREATE TRIGGER TO $i;
+EXIT;
+EOF
+done
+
+DROP USER $i CASCADE;
+DROP TABLESPACE $i INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS;
+
+Java Installation: ( amazon vm )
+------------------------
+[ec2-user@ip-172-31-9-252 TOMCAT]$ uname -a
+Linux ip-172-31-9-252.eu-north-1.compute.internal 6.12.0-211.16.1.el10_2.x86_64 #1 SMP PREEMPT_DYNAMIC Mon May 18 10:23:57 EDT 2026 x86_64 GNU/Linux
+
+
+wget https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.26/bin/apache-tomcat-11.0.26.tar.gz
+uname -a
+sudo dnf install https://download.oracle.com/java/25/latest/jdk-25_linux-x64_bin.rpm
+java -version
+javac -version

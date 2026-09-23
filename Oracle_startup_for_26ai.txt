@@ -155,7 +155,7 @@ ssh -N  -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -i ~/.ssh/gcp_oxygenra
 
 Tablespace and schema creation and drop :
 -----------------------------------------------
-for i in INITIAL_DB
+for i in USER_INFO_SCHEMA
 do
 echo $i
 sqlplus -s sys/welcome1@127.0.0.1:11521/FREEPDB1 as sysdba <<EOF
@@ -190,3 +190,32 @@ uname -a
 sudo dnf install https://download.oracle.com/java/25/latest/jdk-25_linux-x64_bin.rpm
 java -version
 javac -version
+
+
+TOMCAT:
+-------------
+cd eureka-server
+read -r -s -p 'Choose Eureka API/dashboard password: ' EUREKA_PASSWORD; echo
+export EUREKA_PASSWORD=welcome1
+export EUREKA_USERNAME=EUREKA_DB
+java -jar eureka-server.war
+
+sqlplus:
+---------
+unzip -Z1 eureka-server-db.zip | awk -F'/' '{if(NR>1)printf "sqlplus %s/welcome1@127.0.0.1:11521/FREEPDB1 @%s/%s\n", $1,$1,$2}'
+sqlplus EUREKA_DB/welcome1@127.0.0.1:11521/FREEPDB1 @EUREKA_DB/001_create_properties.sql
+sqlplus EUREKA_DB/welcome1@127.0.0.1:11521/FREEPDB1 @EUREKA_DB/002_seed_eureka_port.sql
+
+
+
+
+cd ~/Services/userInfoServices
+
+read -rsp 'USER_INFO_SCHEMA password: ' USER_INFO_DB_PASSWORD
+echo
+read -rsp 'EUREKA_DB password: ' EUREKA_DB_PASSWORD
+echo
+export USER_INFO_DB_PASSWORD EUREKA_DB_PASSWORD
+
+java -jar build/libs/userInfoServices.war
+

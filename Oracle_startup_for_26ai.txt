@@ -219,3 +219,9 @@ export USER_INFO_DB_PASSWORD EUREKA_DB_PASSWORD
 
 java -jar build/libs/userInfoServices.war
 
+
+
+deploy commands:
+=================
+EUREKA_DB_PORT_ENABLED=true nohup java -jar ./eureka-server.war > log.log &
+USER_INFO_DB_PORT_ENABLED=true java -jar ./userInfoServices.war

@@ -284,3 +284,21 @@ hash -r
 "$JAVA_HOME/bin/java.exe" -version
 
 "$JAVA_HOME/bin/java.exe" -jar build/libs/user-info-ui.war
+
+
+
+
+Application	AMIs	Availability Zones	Status
+TRANSACTION-UI-COMPONENT	n/a (1)	(1)	UP (1) - transaction-ui-component:localhost:8782
+USER-INFO-UI	n/a (1)	(1)	UP (1) - user-info-ui:localhost:8780
+USERINFOSERVICES	n/a (1)	(1)	UP (1) - userInfoServices:8771
+USERTRANSACTSERVICES	n/a (1)	(1)	UP (1) - userTransactServices:localhost:8781
+
+it is same like TRANSACTION-UI-COMPONENT part and item name is "Transactions with AI"
+but it will have a text box and ok button at right side .it got clicked.
+Apart ffrom chat it will show a link to open . in that link it will show the details in graph 
+the same graph will be show in below the transactions information . if no transaction is found the link will get generated 
+
+we will work on ai for the links generation and graph generation . for now lets target only the text box and pokay button in the item ui screen 
+lets substitute  item1 with "Transactions with AI"
+as we are going to use same info no DB is required and will consume same service suage only 

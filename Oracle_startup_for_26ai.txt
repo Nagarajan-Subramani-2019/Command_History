@@ -139,6 +139,7 @@ tail -n 20 ~/gcp-db-tunnel.log
 
 sqlplus sys/welcome1@127.0.0.1:11521/FREEPDB1 as sysdba
 
+sqlplus UI_DATA_SCHEMA/welcome1@127.0.0.1:11521/FREEPDB1 
 
 *************************
 
@@ -155,7 +156,7 @@ ssh -N  -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -i ~/.ssh/gcp_oxygenra
 
 Tablespace and schema creation and drop :
 -----------------------------------------------
-for i in USER_INFO_SCHEMA
+for i in UI_DATA_SCHEMA
 do
 echo $i
 sqlplus -s sys/welcome1@127.0.0.1:11521/FREEPDB1 as sysdba <<EOF
@@ -224,4 +225,62 @@ java -jar build/libs/userInfoServices.war
 deploy commands:
 =================
 EUREKA_DB_PORT_ENABLED=true nohup java -jar ./eureka-server.war > log.log &
-USER_INFO_DB_PORT_ENABLED=true java -jar ./userInfoServices.war
+USER_INFO_DB_PORT_ENABLED=true java -jar ./build/libs/userInfoServices.war
+USER_TRANSACT_EUREKA_DB_PORT_ENABLED=true java -jar ./userTransactServices.war
+
+
+component deployemnt:
+==========================
+cd ~/Services/transaction-ui-component
+
+read -rsp 'UI_DATA_SCHEMA password: ' UI_DATA_DB_PASSWORD
+echo
+export UI_DATA_DB_PASSWORD=welcome1
+
+export UI_DATA_DB_URL='jdbc:oracle:thin:@//127.0.0.1:11521/FREEPDB1'
+export EUREKA_URL='http://localhost:8760/eureka-server/eureka/'
+export EUREKA_CLIENT_ENABLED=true
+
+export USER_INFO_BASE_URL='http://127.0.0.1:8771/userInfoServices'
+export USER_TRANSACT_BASE_URL='http://127.0.0.1:8781/userTransactServices'
+export USER_INFO_CONNECTION_MODE=direct
+export USER_TRANSACT_CONNECTION_MODE=direct
+
+export TRANSACTION_UI_PORT=8782
+
+java -jar build/libs/transaction-ui-component.war
+
+
+user_info
+===========
+cd ~/Services/user-info-ui
+
+read -rsp 'UI_DATA_SCHEMA password: ' UI_DATA_DB_PASSWORD
+echo
+export UI_DATA_DB_PASSWORD=welcome1
+
+export UI_DATA_DB_URL='jdbc:oracle:thin:@//127.0.0.1:11521/FREEPDB1'
+export USER_INFO_BASE_URL='http://127.0.0.1:8771/userInfoServices'
+export USER_INFO_CONNECTION_MODE=direct
+
+export EUREKA_URL='http://localhost:8760/eureka-server/eureka/'
+export EUREKA_CLIENT_ENABLED=true
+
+export USER_INFO_UI_PORT=8780
+export UI_COMPONENT_CONNECTION_MODE=direct
+
+java -jar build/libs/user-info-ui.war
+
+
+java issue
+===========
+
+cd ~/Services/user-info-ui
+
+export JAVA_HOME='/c/Program Files/Java/jdk-25.0.4'
+export PATH="$JAVA_HOME/bin:$PATH"
+hash -r
+
+"$JAVA_HOME/bin/java.exe" -version
+
+"$JAVA_HOME/bin/java.exe" -jar build/libs/user-info-ui.war

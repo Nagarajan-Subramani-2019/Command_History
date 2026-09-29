@@ -302,3 +302,93 @@ the same graph will be show in below the transactions information . if no transa
 we will work on ai for the links generation and graph generation . for now lets target only the text box and pokay button in the item ui screen 
 lets substitute  item1 with "Transactions with AI"
 as we are going to use same info no DB is required and will consume same service suage only 
+
+$ cat file.txt
+name age
+hi 123
+hello 1234
+yes 3
+no 2
+
+
+name hi hello yes no 
+age 123 1234 3 2 
+
+
+$  cat file.txt  | awk '{printf "%s %s \n",NF,NR}'
+2 1
+2 2
+2 3
+2 4
+2 5
+
+cat file5.txt | awk '{for(i=1;i<=NF;i++)line[i][i]=$i}
+
+
+cat file.txt  | awk '{if(NR==1){for(i=1;i<=NF;i++){print $i" <><><><><NF><NR><"NF"><"NR">"}}}'
+
+cat file.txt  | awk '{if(NR==1){for(i=1;i<=NF;i++){print $i}}}' > 1.txt 
+cat file.txt  | awk '{if(NR==2){for(i=1;i<=NF;i++){print $i}}}' > 2.txt 
+paste 1.txt 2.txt
+
+
+
+cat file.txt  | awk '{if(NR==1){for(i=1;i<=NF;i++)first_line[i]=$i}if(NR==2){for(i=1;i<=NF;i++)second_line[i]=$i}}END{for(j=1;j<=i;j++)print first_line[j]" "second_line[j]}' 
+cat file2.txt  | awk '{for(i=1;i<=NF;i++)line[NR][i]=$i}END{for(j=1;j<=i-1;j++)print line[j][1]" "line[j][2]}' | sed '/^$/d'
+cat file.txt  | awk '{for(i=1;i<=NF;i++)line[NR][i]=$i}END{for(j=1;j<=i;j++)print line[1][j]" "line[2][j]}'  | sed '/^$/d'
+
+cat file.txt  | awk '{for(i=1;i<=NF;i++)line[NR][i]=$i}{i=NR}END{for(j=1;j<=i;j++){printf "%s ",line[j][1]};printf "\n";for(j=1;j<=i;j++){printf "%s ",line[j][2]}}'
+cat file2.txt  | awk '{for(i=1;i<=NF;i++)line[NR][i]=$i}{i=NR}END{for(j=1;j<=i;j++){printf "%s ",line[j][1]};if(NF>1){printf "\n";for(j=1;j<=i;j++){printf "%s ",line[j][2]}}}' 
+cat file.txt  | awk '{for(i=1;i<=NF;i++)line[NR][i]=$i}{i=NR}END{for(j=1;j<=i;j++){printf "%s ",line[j][1]};if(NF>1){printf "\n";for(j=1;j<=i;j++){printf "%s ",line[j][2]}}}' 
+
+
+
+cat file4.txt | awk '{for(i=1;i<=NF;i++)line[NR][i]=$i}{i=NR}END{ \
+for(j=1;j<=i;j++){if(j==1)printf "%s",line[j][1];if(j>1)printf " %s",line[j][1]}; \
+if(NF>1){printf "\n"; \
+for(j=1;j<=i;j++){if(j==1)printf "%s",line[j][2];if(j>1)printf " %s",line[j][2]}}}' | sed -n l
+
+
+cat file5.txt | awk '{for(i=1;i<=NF;i++)if(NR==1){line[i]=$i}else{line[i]=line[i]" "$i}}END{for(z=1;z<=NF;z++)print line[z]}
+ \
+
+
+
+ (xxx) xxx-xxxx or xxx-xxx-xxxx
+ 
+ egrep -w '^[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]$|^\([0-9][0-9][0-9]\)\ [0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]$' file.txt
+ 
+ 
+ NagarajanSubramani@nagarasu-296B894 MINGW64 ~
+$ cat file7.txt   |  sed 's/\\n/ /g'
+how many cans can a canner can if a canner can can cans  a canner can can as many cans as a canner can if a canner can can a can a canner can can as many cans as a canner can cans
+how many cans can a canner can if a canner can can cans\na canner can can as many cans as a canner can if a canner can can a can\na canner can can as many cans as a canner can cans
+
+NagarajanSubramani@nagarasu-296B894 MINGW64 ~
+$
+
+
+
+
+===============================================================
+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
+
+
+export OPENAI_API_KEY="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"
+./gradlew --refresh-dependencies clean build
+./gradlew test
+
+For jarfile creation :
+===========================
+./gradlew clean bootJar
+
+bringing jarfile up :
+=============================
+export OPENAI_API_KEY="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"
+java -jar build/libs/demo-0.0.1-SNAPSHOT.jar
+
+
+
+key for oxygensuse
+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
+

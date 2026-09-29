@@ -384,7 +384,7 @@ For jarfile creation :
 
 bringing jarfile up :
 =============================
-export OPENAI_API_KEY="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"
+export OPENAI_API_KEY="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"
 java -jar build/libs/demo-0.0.1-SNAPSHOT.jar
 
 
@@ -392,3 +392,9 @@ java -jar build/libs/demo-0.0.1-SNAPSHOT.jar
 key for oxygensuse
 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
 
+
+
+C:\Users\NagarajanSubramani\Documents\GitHub\Resume
+add spring AI
+models ollama - chat/text AI
+comfy - image AI

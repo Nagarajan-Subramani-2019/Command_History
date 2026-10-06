@@ -398,3 +398,22 @@ C:\Users\NagarajanSubramani\Documents\GitHub\Resume
 add spring AI
 models ollama - chat/text AI
 comfy - image AI
+
+
+
+
+siffusion - unfiltered
+=========================
+
+Set-Location 'C:\Users\NagarajanSubramani\Desktop\Compfy\ComfyUI_windows_portable_intel\ComfyUI_windows_portable'
+
+.\python_embeded\python.exe -s .\ComfyUI\main.py --windows-standalone-build --fp8_e4m3fn-unet --cpu-vae --cache-none --listen 127.0.0.1 --port 8188
+
+
+making the requests automatically
+========================================
+Set-Location 'C:\Users\NagarajanSubramani\.codex\visualizations\2026\09\08\01a08102-4c72-7333-98da-eaa11869d58b\qwen-prompt-page-8100'
+
+$env:PORT = '8100'
+
+& 'C:\Program Files\nodejs\node.exe' .\server.cjs

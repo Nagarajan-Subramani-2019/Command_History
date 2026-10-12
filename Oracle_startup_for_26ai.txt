@@ -413,3 +413,145 @@ Set-Location 'C:\Users\NagarajanSubramani\.codex\visualizations\2026\09\08\01a08
 $env:PORT = '8100'
 
 & 'C:\Program Files\nodejs\node.exe' .\server.cjs
+
+
+
+
+
+
+
+
+
+****************************
+****************************
+****************************
+****************************
+****************************
+****************************
+****************************
+****************************
+****************************
+****************************
+****************************
+****************************
+****************************
+****************************
+****************************
+****************************
+
+[root@localhost ORACLE_SOFTWARE]# sudo /etc/init.d/oracle-free-26ai configure
+Specify a password to be used for database accounts. Oracle recommends that the password entered should be at least 8 characters in length, contain at least 1 uppercase character, 1 lower case character and 1 digit [0-9]. Note that the same password will be used for SYS, SYSTEM and PDBADMIN accounts:
+Confirm the password:
+Configuring Oracle Listener.
+Listener configuration succeeded.
+Configuring Oracle AI Database FREE.
+Enter SYS user password:
+********
+Enter SYSTEM user password:
+*******
+Enter PDBADMIN User Password:
+********
+Prepare for db operation
+7% complete
+Copying database files
+29% complete
+Creating and starting Oracle instance
+30% complete
+33% complete
+36% complete
+39% complete
+43% complete
+Completing Database Creation
+47% complete
+49% complete
+50% complete
+Creating Pluggable Databases
+54% complete
+71% complete
+Executing Post Configuration Actions
+93% complete
+Running Custom Scripts
+100% complete
+Database creation complete. For details check the logfiles at:
+ /opt/oracle/cfgtoollogs/dbca/FREE.
+Database Information:
+Global Database Name:FREE
+System Identifier(SID):FREE
+Look at the log file "/opt/oracle/cfgtoollogs/dbca/FREE/FREE.log" for further details.
+
+Connect to Oracle AI Database using one of the connect strings:
+     Pluggable database: localhost.localdomain/FREEPDB1
+     Multitenant container database: localhost.localdomain
+
+
+
+
+    1  pwd
+    2  dnf -y install oracle-ai-database-preinstall-26ai
+    3  dnf -y install oracle-ai-database-free-26ai-23.26.2-1.el9.x86_64.rpm
+    4  sudo mv -n /etc/init.d/oracle-free-26ai /root/oracle-free-26ai.empty-backup
+    5  wget https://download.oracle.com/otn-pub/otn_software/db-free/oracle-ai-database-free-26ai-23.26.3-1.el10.x86_64.rpm
+    6  ls -ltr
+    7  sudo dnf install -y oracle-ai-database-free-26ai-23.26.3-1.el10.x86_64.rpm
+    8  cat /etc/init.d/oracle-free-26ai
+    9  sudo /etc/init.d/oracle-free-26ai configure
+   10  history
+
+sudo systemctl daemon-reload
+sudo systemctl enable oracle-free-26ai
+sudo /etc/init.d/oracle-free-26ai status
+
+sqlplus,badatabseclientBasic.It is not installed as already these modules are installed in oracle database .
+
+for i in oracle-instantclient-basic-23.26.3.0.0-1.el10.x86_64.rpm oracle-instantclient-sqlplus-23.26.3.0.0-1.el10.x86_64.rpm
+do
+wget https://download.oracle.com/otn_software/linux/instantclient/2326300/$i
+done
+
+for i in oracle-instantclient-basic-23.26.3.0.0-1.el10.x86_64.rpm oracle-instantclient-sqlplus-23.26.3.0.0-1.el10.x86_64.rpm
+do
+sudo dnf install -y $i --allowerasing
+done
+
+
+
+
+su - oracle
+export ORACLE_SID=FREE
+export ORACLE_HOME=/opt/oracle/product/26ai/dbhomeFree
+export PATH="$ORACLE_HOME/bin:$PATH"
+sqlplus / as sysdba
+SQL> sho pdbs
+
+    CON_ID CON_NAME                       OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+         2 PDB$SEED                       READ ONLY  NO
+         3 FREEPDB1                       READ WRITE NO
+         4 PDB_DEV                        READ WRITE NO
+         5 PDB_HIGH                       READ WRITE NO
+
+/home/oracle
+
+SET VERIFY OFF
+SET ECHO OFF
+
+
+CREATE PLUGGABLE DATABASE PDB_DEV
+  ADMIN USER pdbdev_admin IDENTIFIED BY "welcome1"
+  CREATE_FILE_DEST = '/opt/oracle/oradata/FREE';
+
+
+CREATE PLUGGABLE DATABASE PDB_HIGH
+  ADMIN USER pdbhigh_admin IDENTIFIED BY "welcome1"
+  CREATE_FILE_DEST = '/opt/oracle/oradata/FREE';
+
+ALTER PLUGGABLE DATABASE PDB_DEV OPEN;
+ALTER PLUGGABLE DATABASE PDB_DEV SAVE STATE;
+
+ALTER PLUGGABLE DATABASE PDB_HIGH OPEN;
+ALTER PLUGGABLE DATABASE PDB_HIGH SAVE STATE;
+
+
+Tunneling :
+===============
+ssh -N -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -L 127.0.0.1:11521:127.0.0.1:1521 nagarajan@192.168.0.123

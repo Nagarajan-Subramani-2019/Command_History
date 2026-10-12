@@ -1,3 +1,188 @@
+it is working good now . 
+
+
+
+
+
+
+
+4:16 AM
+
+
+
+
+
+
+Good—both terminal and desktop access are working.
+- SSH: ssh nagarajan@192.168.0.123
+- Remote Desktop: 192.168.0.123:3389
+Keep the Linux PC powered on, awake, and booted into Oracle Linux for remote access. Closing the SSH or Remote Desktop window leaves the PC running.
+
+
+4:16 AM
+
+
+
+
+
+
+
+
+Today 10:45 AM
+is it possible to make a common directory accessble by both linux and windows
+
+
+
+
+
+
+
+10:45 AM
+
+
+
+
+
+
+Worked for 5m 13s
+
+
+
+no . i am telling that in a single system windows os and oracle linux os is installed . now i have files in windows os. is there a way from linux to access it 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Yes—you can access the Windows files from Oracle Linux on the same PC by mounting the Windows partition.
+Your earlier screenshot showed C: was still BitLocker-encrypted, even though protection was off. First, check its current state.
+Run these in the Linux terminal or SSH session, one at a time:
+lsblk -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINTS
+cryptsetup --version
+Send a photo of both outputs. We’ll identify the Windows partition and start with read-only access so you can browse and copy its files safely.
+
+
+10:50 AM
+
+
+
+
+
+
+
+
+[nagarajan@localhost ~]$ lsblk -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINTS
+NAME          SIZE FSTYPE    LABEL MOUNTPOINTS
+nvme0n1     476.9G
+├─nvme0n1p1   100M vfat
+├─nvme0n1p2    16M
+├─nvme0n1p3 375.9G BitLocker
+├─nvme0n1p4   896M ntfs
+├─nvme0n1p5   572M vfat            /boot/efi
+├─nvme0n1p6   1.9G xfs             /boot
+├─nvme0n1p7   7.5G swap            [SWAP]
+└─nvme0n1p8  90.1G xfs             /
+[nagarajan@localhost ~]$
+[nagarajan@localhost ~]$ cryptsetup --version
+cryptsetup 2.8.1 flags: UDEV BLKID KEYRING FIPS KERNEL_CAPI PWQUALITY HW_OPAL
+[nagarajan@localhost ~]$
+
+
+
+
+
+
+
+10:53 AM
+
+
+
+
+
+
+Worked for 6m 9s
+
+
+
+Your Windows C: drive is /dev/nvme0n1p3. We can try accessing it read-only using Dislocker and the stored unlock key from its protection-off state. Dislocker instructions
+Run these on Linux, one command at a time. If any command fails, stop and send the error.
+1. Install the tools:
+   sudo dnf install -y oracle-epel-release-el10
+   sudo dnf install -y fuse-dislocker ntfs-3g
+2. Create the mount folders:
+   sudo mkdir -p /mnt/windows-bitlocker /mnt/windows
+3. Open the encrypted partition read-only:
+   sudo dislocker-fuse -r -V /dev/nvme0n1p3 -c -- /mnt/windows-bitlocker
+4. Mount its Windows filesystem read-only:
+   sudo mount -t ntfs-3g -o "ro,loop,uid=$(id -u),gid=$(id -g),umask=077" /mnt/windows-bitlocker/dislocker-file /mnt/windows
+5. Open Files, press Ctrl + L, and enter:
+   /mnt/windows
+You should see the contents of C:. Your Windows account’s files will normally be under Users → Admin. You can copy files into Linux; this setup keeps the Windows files read-only.
+Before restarting, close files opened there and run:
+sudo umount /mnt/windows
+sudo umount /mnt/windows-bitlocker
+
+
+10:59 AM
+
+
+
+
+
+
+
+
+Today 1:51 PM
+the files are in desktop is it okay ?
+
+
+
+
+
+
+
+1:51 PM
+
+
+
+
+
+
+Yes—files on the Windows Desktop are accessible too.
+After mounting the Windows drive, open Files, press Ctrl + L, and enter:
+/mnt/windows/Users/Admin/Desktop
+Your earlier Windows screenshots showed the account name Admin.
+If that folder is empty and your Desktop uses OneDrive, check:
+/mnt/windows/Users/Admin/OneDrive/Desktop
+You can copy the files into your Linux Home or Desktop folder.
+
+
+1:52 PM
+
+
+
+
+
+
+
+
+Today 3:26 PM
+
+
+
+
+
+
 previously i saw the files
 
 
@@ -35,3 +220,91 @@ Run the two mounting commands again to access them. Keep the drive mounted while
 
 
 3:28 PM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Worked for 2m 48s
+
+
+
+VLC is reporting that H.264 decoding is unavailable. Let’s check which playback packages are installed.
+Run these on Linux, one at a time:
+rpm -q vlc vlc-plugin-ffmpeg libavcodec-free noopenh264 openh264
+dnf repolist --enabled
+Paste both outputs here. They will show whether VLC’s decoder plugin is missing or whether it needs an additional codec package.
+
+
+3:35 PM
+
+
+
+
+
+
+
+
+[nagarajan@localhost mnt]$ /mnt/windows/Users/Admin/Desktop
+-bash: /mnt/windows/Users/Admin/Desktop: Is a directory
+[nagarajan@localhost mnt]$ ls -ltr /mnt/windows/Users/Admin/Desktop
+total 13
+-rwx------. 1 nagarajan nagarajan  282 Apr  1  2024  desktop.ini
+drwx------. 1 nagarajan nagarajan 8192 Oct  9 21:09 'MS Office 2013 64-bit'
+drwx------. 1 nagarajan nagarajan 4096 Oct 12 01:48 'New folder'
+[nagarajan@localhost mnt]$ rpm -q vlc vlc-plugin-ffmpeg libavcodec-free noopenh264 openh264
+vlc-3.0.24-1.el10_2.x86_64
+package vlc-plugin-ffmpeg is not installed
+package libavcodec-free is not installed
+package noopenh264 is not installed
+package openh264 is not installed
+[nagarajan@localhost mnt]$ dnf repolist --enabled
+repo id                                                                                               repo name
+ol10_UEKR8                                                                                            Oracle Linux 10 UEK Release 8 (x86_64)
+ol10_appstream                                                                                        Oracle Linux 10 Application Stream Packages (x86_64)
+ol10_baseos_latest                                                                                    Oracle Linux 10 BaseOS Latest (x86_64)
+ol10_u2_developer_EPEL                                                                                Oracle Linux 10.2 EPEL Packages for Development (x86_64)
+[nagarajan@localhost mnt]$
+
+
+
+
+
+Show more
+
+3:38 PM
+
+
+
+
+
+
+Worked for 5m 42s
+
+
+
+Your Windows Desktop files are accessible. “Is a directory” is harmless—to enter that folder, use:
+cd /mnt/windows/Users/Admin/Desktop
+For the video error, I recommend VLC from Flathub, which bundles its own FFmpeg codecs. Package details
+1. Run these commands on Oracle Linux, one at a time:
+   sudo dnf install -y flatpak
+   flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+   flatpak install --user -y flathub org.videolan.VLC
+   Wait for installation to finish. These follow the Flatpak installation procedure.
+2. Close your existing VLC. Open Terminal inside the Linux desktop or RDP session, then launch the newly installed version:
+   flatpak run org.videolan.VLC
+3. In that VLC window, select Media → Open File and choose your video under:
+   /mnt/windows/Users/Admin/Desktop/New folder
+If any command fails, paste its output before continuing.
+
+
+3:44 PM

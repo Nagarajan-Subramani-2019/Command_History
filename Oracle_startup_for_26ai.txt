@@ -626,6 +626,20 @@ export CATALINA_HOME
 
 ssh -N -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -L 127.0.0.1:8880:127.0.0.1:8080 nagarajan@192.168.0.123
 
+/home/nagarajan/TOMCAT_SOFTWARE/apache-tomcat-11.0.26-war-only/conf
+
+for i in setenv.sh 
+do
+cp /home/nagarajan/TOMCAT_SOFTWARE/apache-tomcat-11.0.26_0/bin/$i /home/nagarajan/TOMCAT_SOFTWARE/apache-tomcat-11.0.26-war-only/bin/$i
+ls -ltr /home/nagarajan/TOMCAT_SOFTWARE/apache-tomcat-11.0.26_0/bin/$i /home/nagarajan/TOMCAT_SOFTWARE/apache-tomcat-11.0.26-war-only/bin/$i
+done 
+
+cd /home/nagarajan/TOMCAT_SOFTWARE/apache-tomcat-11.0.26-war-only/bin
+nohup ./cataina.sh run & 
+
+ssh -N -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -L 127.0.0.1:8880:127.0.0.1:8080 nagarajan@192.168.0.123
+
+
 Jenkins WAR:
 =================
 /home/nagarajan/JENKINS_SOFTWARE

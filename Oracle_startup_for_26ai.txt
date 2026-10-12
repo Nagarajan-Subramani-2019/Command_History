@@ -371,10 +371,6 @@ $
 
 
 ===============================================================
-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
-
-
-export OPENAI_API_KEY="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"
 ./gradlew --refresh-dependencies clean build
 ./gradlew test
 

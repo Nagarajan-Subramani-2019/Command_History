@@ -1,0 +1,37 @@
+previously i saw the files
+
+
+
+
+
+
+
+3:27 PM
+
+
+
+
+
+
+Those folders exist, but the Windows drive isn’t currently mounted. If you ran the earlier umount commands, that would explain the empty folders.
+Run these on Linux, one at a time. Stop and send the error if any command fails.
+sudo dislocker-fuse -r -V /dev/nvme0n1p3 -c -- /mnt/windows-bitlocker
+sudo mount -t ntfs-3g -o "ro,loop,uid=$(id -u),gid=$(id -g),umask=077" /mnt/windows-bitlocker/dislocker-file /mnt/windows
+Then check:
+ls /mnt/windows
+You should see folders such as Users, Windows, and Program Files.
+If successful, open Files → Ctrl + L and enter:
+/mnt/windows/Users/Admin/Desktop
+Use the unmount commands only after you finish accessing the files.
+
+
+
+
+
+
+That confirms the Windows files were accessible successfully.
+If you ran umount or restarted Linux afterward, the mount folders become empty. Unmounting does not delete the Windows files; it only disconnects them from /mnt/windows.
+Run the two mounting commands again to access them. Keep the drive mounted while browsing or copying, and unmount it when finished.
+
+
+3:28 PM

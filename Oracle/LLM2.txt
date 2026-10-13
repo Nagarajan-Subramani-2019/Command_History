@@ -1,0 +1,321 @@
+delete for all thes entries in databasechangelog
+
+
+
+
+
+
+
+Aug 13, 4:52 PM
+
+
+
+
+
+
+DELETE FROM AIF_AGENTCORE.databasechangelog
+WHERE filename IN (
+    'V261_1_26.1.0.0.0_1_527261100_1_0__CPO_AI_PCO_USECASE_SETTING.sql',
+    'V261_1_26.1.0.0.0_2_527261101_1_0__CPO_AI_PCO_USECASE_SETTING_DET.sql',
+    'V261_1_26.1.0.0.0_3_527261102_1_0__CPO_AI_PCO_USECASE_PROMPT.sql',
+    'V261_1_26.1.0.0.0_4_527261103_1_0__CPO_AI_PCO_STRICT_JSON_MAP_REDUCE.sql',
+    'V261_1_26.1.0.0.0_5_527261104_1_0__CPO_AI_PCO_L1_WHOLE_CHECK_BATCH.sql'
+);
+
+COMMIT;
+
+
+Aug 13, 4:52 PM
+
+
+
+
+
+
+
+
+go with platoaif schema
+11:24:23:756 | plato-sqlcl-deployer  | INFO  |  o.f.p.s.p.SQLCLApplication.createConnectionString | ******************************************************
+11:24:23:756 | plato-sqlcl-deployer  | INFO  |  o.f.p.s.p.SQLCLApplication.createConnectionString | SQLCL UPDATE FOR SERVICE : cpo-agent-services , TARGET : platoaif
+11:24:23:756 | plato-sqlcl-deployer  | INFO  |  o.f.p.s.p.SQLCLApplication.createConnectionString | ******************************************************
+11:24:23:756 | plato-sqlcl-deployer  | INFO  |  o.f.p.s.p.SQLCLApplication.runSqlcl | Starting liquibase command
+11:24:24:519 | plato-sqlcl-deployer  | ERROR |  o.f.p.s.p.SQLCLApplication.runSqlcl | Error occurred while executing 'update' command for changelog 'V261_1_snapshot_cpo-agent-services_changelog.xml' in searchpath '/scratch/support_node_jenkins/workspace/cpo_jobs/RP_OPDS/CD_With_Parametrization/5.i.CD.NEW_apo_agent_services_new/for_5239/OPDS_SQLcL/temp-extracted-files/changelog/full/platoaif'
+liquibase.exception.ValidationFailedException: Validation Failed:
+     5 changesets check sum
+          V261_1_26.1.0.0.0_1_527261100_1_0__CPO_AI_PCO_USECASE_SETTING.sql::SQLcL::SQLcL was: 9:ae45a3a5030d3134d0b9b38848ec8961 but is now: 9:53841d824e9e07d39812435d13b8c0e0
+          V261_1_26.1.0.0.0_2_527261101_1_0__CPO_AI_PCO_USECASE_SETTING_DET.sql::SQLcL::SQLcL was: 9:60b2c77e202d7c82e6e2aef265cbd8d9 but is now: 9:696510b7e77edc80198a74499c875c50
+          V261_1_26.1.0.0.0_3_527261102_1_0__CPO_AI_PCO_USECASE_PROMPT.sql::SQLcL::SQLcL was: 9:fc4152b304e1a34f0edf68fbe38a3884 but is now: 9:0e811824d3f4586a4af5e59b9c4ba9b9
+          V261_1_26.1.0.0.0_4_527261103_1_0__CPO_AI_PCO_STRICT_JSON_MAP_REDUCE.sql::SQLcL::SQLcL was: 9:37ff74525daaab5cd2becf7b5e03f78e but is now: 9:fdfc4e6f8334605258bdc30065d67beb
+          V261_1_26.1.0.0.0_5_527261104_1_0__CPO_AI_PCO_L1_WHOLE_CHECK_BATCH.sql::SQLcL::SQLcL was: 9:b102fcfe3623749a59a49a012a96955c but is now: 9:2731dd36b3f367fb79429b283efd0166
+    at liquibase.changelog.DatabaseChangeLog.validate(DatabaseChangeLog.java:353)
+    at liquibase.command.core.helpers.DatabaseChangelogCommandStep.run(DatabaseChangelogCommandStep.java:92)
+    at liquibase.command.CommandScope.execute(CommandScope.java:214)
+    ... 17 common frames omitted
+Wrapped by: liquibase.exception.CommandExecutionException: liquibase.exception.ValidationFailedException: Validation Failed:
+     5 changesets check sum
+          V261_1_26.1.0.0.0_1_527261100_1_0__CPO_AI_PCO_USECASE_SETTING.sql::SQLcL::SQLcL was: 9:ae45a3a5030d3134d0b9b38848ec8961 but is now: 9:53841d824e9e07d39812435d13b8c0e0
+          V261_1_26.1.0.0.0_2_527261101_1_0__CPO_AI_PCO_USECASE_SETTING_DET.sql::SQLcL::SQLcL was: 9:60b2c77e202d7c82e6e2aef265cbd8d9 but is now: 9:696510b7e77edc80198a74499c875c50
+          V261_1_26.1.0.0.0_3_527261102_1_0__CPO_AI_PCO_USECASE_PROMPT.sql::SQLcL::SQLcL was: 9:fc4152b304e1a34f0edf68fbe38a3884 but is now: 9:0e811824d3f4586a4af5e59b9c4ba9b9
+          V261_1_26.1.0.0.0_4_527261103_1_0__CPO_AI_PCO_STRICT_JSON_MAP_REDUCE.sql::SQLcL::SQLcL was: 9:37ff74525daaab5cd2becf7b5e03f78e but is now: 9:fdfc4e6f8334605258bdc30065d67beb
+          V261_1_26.1.0.0.0_5_527261104_1_0__CPO_AI_PCO_L1_WHOLE_CHECK_BATCH.sql::SQLcL::SQLcL was: 9:b102fcfe3623749a59a49a012a96955c but is now: 9:2731dd36b3f367fb79429b283efd0166
+
+
+
+
+
+Show more
+
+Aug 13, 4:57 PM
+
+
+
+
+
+
+-- Target schema: PLATOAIF
+-- Service: cpo-agent-services
+
+DELETE FROM PLATOAIF.databasechangelog
+WHERE filename IN (
+    'V261_1_26.1.0.0.0_1_527261100_1_0__CPO_AI_PCO_USECASE_SETTING.sql',
+    'V261_1_26.1.0.0.0_2_527261101_1_0__CPO_AI_PCO_USECASE_SETTING_DET.sql',
+    'V261_1_26.1.0.0.0_3_527261102_1_0__CPO_AI_PCO_USECASE_PROMPT.sql',
+    'V261_1_26.1.0.0.0_4_527261103_1_0__CPO_AI_PCO_STRICT_JSON_MAP_REDUCE.sql',
+    'V261_1_26.1.0.0.0_5_527261104_1_0__CPO_AI_PCO_L1_WHOLE_CHECK_BATCH.sql'
+);
+
+COMMIT;
+
+
+Aug 13, 4:57 PM
+
+
+
+
+
+
+
+
+liquibase.exception.ValidationFailedException: Validation Failed:
+     5 changesets check sum
+          V261_1_26.1.0.0.0_1_527261100_1_0__CPO_AI_PCO_USECASE_SETTING.sql::SQLcL::SQLcL was: 9:ae45a3a5030d3134d0b9b38848ec8961 but is now: 9:53841d824e9e07d39812435d13b8c0e0
+          V261_1_26.1.0.0.0_2_527261101_1_0__CPO_AI_PCO_USECASE_SETTING_DET.sql::SQLcL::SQLcL was: 9:60b2c77e202d7c82e6e2aef265cbd8d9 but is now: 9:696510b7e77edc80198a74499c875c50
+          V261_1_26.1.0.0.0_3_527261102_1_0__CPO_AI_PCO_USECASE_PROMPT.sql::SQLcL::SQLcL was: 9:fc4152b304e1a34f0edf68fbe38a3884 but is now: 9:0e811824d3f4586a4af5e59b9c4ba9b9
+          V261_1_26.1.0.0.0_4_527261103_1_0__CPO_AI_PCO_STRICT_JSON_MAP_REDUCE.sql::SQLcL::SQLcL was: 9:37ff74525daaab5cd2becf7b5e03f78e but is now: 9:fdfc4e6f8334605258bdc30065d67beb
+          V261_1_26.1.0.0.0_5_527261104_1_0__CPO_AI_PCO_L1_WHOLE_CHECK_BATCH.sql::SQLcL::SQLcL was: 9:b102fcfe3623749a59a49a012a96955c but is now: 9:2731dd36b3f367fb79429b283efd0166
+    at liquibase.changelog.DatabaseChangeLog.validate(DatabaseChangeLog.java:353)
+    at liquibase.command.core.helpers.DatabaseChangelogCommandStep.run(DatabaseChangelogCommandStep.java:92)
+    at liquibase.command.CommandScope.execute(CommandScope.java:214)
+    ... 17 common frames omitted
+Wrapped by: liquibase.exception.CommandExecutionException: liquibase.exception.ValidationFailedException: Validation Failed:
+     5 changesets check sum
+          V261_1_26.1.0.0.0_1_527261100_1_0__CPO_AI_PCO_USECASE_SETTING.sql::SQLcL::SQLcL was: 9:ae45a3a5030d3134d0b9b38848ec8961 but is now: 9:53841d824e9e07d39812435d13b8c0e0
+          V261_1_26.1.0.0.0_2_527261101_1_0__CPO_AI_PCO_USECASE_SETTING_DET.sql::SQLcL::SQLcL was: 9:60b2c77e202d7c82e6e2aef265cbd8d9 but is now: 9:696510b7e77edc80198a74499c875c50
+          V261_1_26.1.0.0.0_3_527261102_1_0__CPO_AI_PCO_USECASE_PROMPT.sql::SQLcL::SQLcL was: 9:fc4152b304e1a34f0edf68fbe38a3884 but is now: 9:0e811824d3f4586a4af5e59b9c4ba9b9
+          V261_1_26.1.0.0.0_4_527261103_1_0__CPO_AI_PCO_STRICT_JSON_MAP_REDUCE.sql::SQLcL::SQLcL was: 9:37ff74525daaab5cd2becf7b5e03f78e but is now: 9:fdfc4e6f8334605258bdc30065d67beb
+          V261_1_26.1.0.0.0_5_527261104_1_0__CPO_AI_PCO_L1_WHOLE_CHECK_BATCH.sql::SQLcL::SQLcL was: 9:b102fcfe3623749a59a49a012a96955c but is now: 9:2731dd36b3f367fb79429b283efd0166
+
+
+
+
+
+Show more
+
+Aug 13, 4:58 PM
+
+
+
+
+
+
+-- Target schema: PLATOAIF
+-- Update stored checksums to match current SQL files
+
+UPDATE PLATOAIF.databasechangelog
+SET MD5SUM = '9:53841d824e9e07d39812435d13b8c0e0'
+WHERE FILENAME = 'V261_1_26.1.0.0.0_1_527261100_1_0__CPO_AI_PCO_USECASE_SETTING.sql'
+  AND MD5SUM = '9:ae45a3a5030d3134d0b9b38848ec8961';
+
+UPDATE PLATOAIF.databasechangelog
+SET MD5SUM = '9:696510b7e77edc80198a74499c875c50'
+WHERE FILENAME = 'V261_1_26.1.0.0.0_2_527261101_1_0__CPO_AI_PCO_USECASE_SETTING_DET.sql'
+  AND MD5SUM = '9:60b2c77e202d7c82e6e2aef265cbd8d9';
+
+UPDATE PLATOAIF.databasechangelog
+SET MD5SUM = '9:0e811824d3f4586a4af5e59b9c4ba9b9'
+WHERE FILENAME = 'V261_1_26.1.0.0.0_3_527261102_1_0__CPO_AI_PCO_USECASE_PROMPT.sql'
+  AND MD5SUM = '9:fc4152b304e1a34f0edf68fbe38a3884';
+
+UPDATE PLATOAIF.databasechangelog
+SET MD5SUM = '9:fdfc4e6f8334605258bdc30065d67beb'
+WHERE FILENAME = 'V261_1_26.1.0.0.0_4_527261103_1_0__CPO_AI_PCO_STRICT_JSON_MAP_REDUCE.sql'
+  AND MD5SUM = '9:37ff74525daaab5cd2becf7b5e03f78e';
+
+UPDATE PLATOAIF.databasechangelog
+SET MD5SUM = '9:2731dd36b3f367fb79429b283efd0166'
+WHERE FILENAME = 'V261_1_26.1.0.0.0_5_527261104_1_0__CPO_AI_PCO_L1_WHOLE_CHECK_BATCH.sql'
+  AND MD5SUM = '9:b102fcfe3623749a59a49a012a96955c';
+
+COMMIT;
+
+
+Aug 13, 4:58 PM
+
+
+
+
+
+
+
+
+print ' using awk 
+
+
+
+
+
+
+
+Aug 13, 5:12 PM
+
+
+
+
+
+
+awk 'BEGIN { print "\047" }'
+This prints a single quote (').
+
+
+Aug 13, 5:12 PM
+
+
+
+
+
+
+
+
+[ofss@ofss-mum-1159 bin]$ ./catalina.sh run Using CATALINA_BASE: /scratch/Super…
+
+
+
+
+Worked for 11s
+
+
+
+Tomcat is failing before startup because the JaCoCo agent cannot bind to port 6035.
+CATALINA_OPTS contains repeated -javaagent entries, all configured with output=tcpserver and port=6035. Only one process/agent can listen on that port.
+Keep only one JaCoCo entry, or disable it if code coverage is not required:
+-javaagent:/scratch/wlsappuser/jacoco-25/lib/jacocoagent.jar=append=true,output=tcpserver,address=*,port=6035
+To identify the current process using the port:
+ss -ltnp | grep 6035
+If it is a stale Tomcat/Java process, stop that process before restarting. Also clean the duplicated CATALINA_OPTS; the log shows the same configuration blocks repeated multiple times, including conflicting 3608 and 2108 environment values.
+
+
+Aug 13, 5:24 PM
+
+
+
+
+
+
+
+
+rshared2.gbucdsint02bom.oraclevcn.com:8002/config-service -Dplato.services.zipk…
+
+
+
+
+Worked for 9s
+
+
+
+Tomcat fails because server.xml is malformed at line 280. There is an extra standalone < immediately before the <Context> element.
+Remove this line:
+<
+The corrected section should be:
+<Context path="/cpo-agent-services"
+         docBase="/scratch/obma_installer/deployables/apps/11.1.0/cpo-agent-services-11.1.0.war"
+/>
+Validate before restart:
+xmllint --noout /scratch/SuperBundle/tomcat/lifecycle/user_home/tomcat_for_5239/tomcat-cpo-agent-services/conf/server.xml
+Then start Tomcat again.
+
+
+Aug 13, 5:31 PM
+
+
+
+
+
+
+
+
+bind => [ofss-mum-3648:2054563, d9990aff-1c59-4f7e-b44f-9bc02975a59a, 330, 6000…
+
+
+
+
+Worked for 11s
+
+
+
+No application error is shown in this log.
+The scheduling-1 worker is running normally and executing scan-job maintenance:
+- Cancels jobs where cancel_requested = 'Y'.
+- Moves expired RUNNING jobs to RETRY_WAIT or FAILED.
+- Uses a retry delay of 15 seconds.
+- Marks the scan run as FAILED only after the phase-attempt limit is exhausted.
+To identify impacted jobs:
+SELECT scan_id,
+       job_id,
+       current_phase,
+       job_status,
+       phase_status,
+       phase_attempt_count,
+       max_phase_attempts,
+       worker_id,
+       lease_expires_at,
+       phase_deadline_at,
+       last_error_code,
+       last_error_message
+FROM VLM_AGNT_SCAN_JOB
+WHERE last_error_code = 'WORKER_LEASE_OR_DEADLINE_EXPIRED'
+   OR job_status IN ('RETRY_WAIT', 'FAILED')
+ORDER BY updated_at DESC;
+The condition to investigate is worker lease expiry or phase deadline expiry, not a database connectivity issue.
+
+
+Aug 13, 5:40 PM
+
+
+
+
+
+
+
+
+ULTENTITY","traceid":"6a7dbb64fc040a79d21655add158e8dc","spanid":"d21655add158e…
+
+
+
+
+Worked for 13s
+
+
+
+The issue is that cpo-agent-services cannot discover CPO-PRODUCT-SERVICES.
+No servers available for service: CPO-PRODUCT-SERVICES
+Service Instance cannot be null, serviceId: CPO-PRODUCT-SERVICES
+As a result, the semantic warm-up for portfolio 0020 fails; no product-familiarity candidates are fetched.
+Check the following:
+1. Confirm cpo-product-services is running and registered with Eureka.
+2. Verify both services point to the same Eureka endpoint and environment.
+3. Confirm the registered service ID is exactly CPO-PRODUCT-SERVICES.
+4. Check connectivity from ofss-mum-3648 to the product service/Eureka server.
+The scheduler SQL and scan-job lease updates in the log are normal background processing.
+
+
+Aug 13, 6:11 PM

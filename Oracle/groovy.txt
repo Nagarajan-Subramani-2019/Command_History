@@ -1,0 +1,427 @@
+Skip to content Jenkins cpo_jobs2 RP_OPDS CD_With_Parametrization 1.x.Generic_C…
+
+issue in case
+
+
+
+
+
+
+
+Jul 29, 12:36 AM
+
+
+
+
+
+
+Worked for 30s
+
+
+
+Yes—the case condition is the issue.
+Your log shows:
+ServiceName is <> cpo-product-services
+URL_value is .../fsgbubanking_rp-services_48365/cpo-product-services.git
+But cpo-product-services should use:
+fsgbubanking_pmu-internal-services_112508
+This does not work in Groovy:
+case 'slp-setup-services|cpo-product-services':
+It is treated as one literal string, not an OR condition.
+Use a list:
+def serviceName = env.ServiceName
+def URL_Suffix = ''
+
+switch (serviceName) {
+    case [
+        'cpo-rules-library',
+        'rp-test-stub-services',
+        'slpr-data-transfer-service',
+        'cpo-pricing-simulation',
+        'data-foundation-services',
+        'cpo-inquiry-agent',
+        'cpo-pricing-services',
+        'slpr-batchcategory-services'
+    ]:
+        URL_Suffix = 'fsgbubanking_rp-services_48365'
+        break
+
+    case ['slp-setup-services', 'cpo-product-services']:
+        URL_Suffix = 'fsgbubanking_pmu-internal-services_112508'
+        break
+
+    case 'batch<>':
+        URL_Suffix = 'fsgbubanking_plato-commoncore-projects_14341'
+        break
+
+    case 'cpo-agent-services':
+        URL_Suffix = 'fsgbubanking_pph-agents_129394'
+        break
+
+    case ['cpo-valuemetrics-ingestion-services', 'cpo-valuemetrics-services']:
+        URL_Suffix = 'fsgbubanking_pph-valuemetrics_129409'
+        break
+
+    default:
+        error "No repository mapping found for ServiceName: ${serviceName}"
+}
+
+env.URL = "${URL_Prefix}/${URL_Suffix}/${serviceName}.git"
+echo "URL_value is ${env.URL}"
+For cpo-product-services, the resulting URL will be:
+ssh://.../fsgbubanking_pmu-internal-services_112508/cpo-product-services.git
+Your previous default URL_Sufffix='fsgbubanking_rp-services_48365' hid the failed match and caused Jenkins to clone from the wrong ALM project.
+
+
+Jul 29, 12:37 AM
+
+
+
+
+
+
+
+
+@Library("sharedLibrary_FromALM") _ pipeline { agent any environment { def BUIL…
+
+
+
+
+Worked for 53s
+
+
+Your case lists are now correct. The remaining issue is the variable name mismatch.
+You declare and use:
+URL_Sufffix
+but inside every case you assign:
+URL_Suffix
+These are different variables. Therefore URL_Sufffix stays as fXYZ, and Jenkins builds the wrong URL.
+Replace the complete URL mapping section with this:
+def urlPrefix = 'ssh://nagarajan.subramani%40oracle.com@alm.oraclecorp.com'
+def serviceName = params.ServiceName?.trim()
+def urlSuffix = null
+
+if (!serviceName) {
+    error 'ServiceName parameter is required'
+}
+
+switch (serviceName) {
+    case [
+        'cpo-rules-library',
+        'rp-test-stub-services',
+        'slpr-data-transfer-service',
+        'cpo-pricing-simulation',
+        'data-foundation-services',
+        'cpo-inquiry-agent',
+        'cpo-pricing-services',
+        'slpr-batchcategory-services'
+    ]:
+        urlSuffix = 'fsgbubanking_rp-services_48365'
+        break
+
+    case ['slp-setup-services', 'cpo-product-services']:
+        urlSuffix = 'fsgbubanking_pmu-internal-services_112508'
+        break
+
+    case 'batch<>':
+        urlSuffix = 'fsgbubanking_plato-commoncore-projects_14341'
+        break
+
+    case 'cpo-agent-services':
+        urlSuffix = 'fsgbubanking_pph-agents_129394'
+        break
+
+    case ['cpo-valuemetrics-ingestion-services', 'cpo-valuemetrics-services']:
+        urlSuffix = 'fsgbubanking_pph-valuemetrics_129409'
+        break
+
+    default:
+        error "No repository mapping found for ServiceName: ${serviceName}"
+}
+
+env.ServiceName = serviceName
+env.URL = "${urlPrefix}/${urlSuffix}/${serviceName}.git"
+echo "URL_value is ${env.URL}"
+For cpo-product-services, it now generates:
+.../fsgbubanking_pmu-internal-services_112508/cpo-product-services.git
+cmc-opds-services is listed as an allowed parameter but has no mapping yet; it will correctly fail in the default case until you add its ALM project suffix.
+
+
+
+
+Skip to content Jenkins cpo_jobs2 RP_OPDS CD_With_Parametrization 1.x.Generic_C…
+
+
+
+
+
+
+The case is working now.
+This warning proves that cpo-product-services matched its case:
+WorkflowScript seems to be setting a field named URL_Suffix
+But your generated URL still contains fXYZ because you have two different variable names:
+def URL_Sufffix = 'fXYZ'  // used in env.URL
+URL_Suffix = '...'        // assigned inside case
+Fix by using one exact variable name everywhere. Replace the section with:
+def URL_Prefix = 'ssh://nagarajan.subramani%40oracle.com@alm.oraclecorp.com'
+def serviceName = env.ServiceName
+def URL_Suffix = ''
+
+switch (serviceName) {
+    case [
+        'cpo-rules-library',
+        'rp-test-stub-services',
+        'slpr-data-transfer-service',
+        'cpo-pricing-simulation',
+        'data-foundation-services',
+        'cpo-inquiry-agent',
+        'cpo-pricing-services',
+        'slpr-batchcategory-services'
+    ]:
+        URL_Suffix = 'fsgbubanking_rp-services_48365'
+        break
+
+    case ['slp-setup-services', 'cpo-product-services']:
+        URL_Suffix = 'fsgbubanking_pmu-internal-services_112508'
+        break
+
+    case 'cpo-agent-services':
+        URL_Suffix = 'fsgbubanking_pph-agents_129394'
+        break
+
+    case ['cpo-valuemetrics-ingestion-services', 'cpo-valuemetrics-services']:
+        URL_Suffix = 'fsgbubanking_pph-valuemetrics_129409'
+        break
+
+    default:
+        error "No repository mapping found for ServiceName: ${serviceName}"
+}
+
+env.URL = "${URL_Prefix}/${URL_Suffix}/${serviceName}.git"
+echo "URL_value is ${env.URL}"
+Remove every occurrence of URL_Sufffix (double ff).
+The expected output for cpo-product-services is:
+.../fsgbubanking_pmu-internal-services_112508/cpo-product-services.git
+
+
+Jul 29, 12:40 AM
+
+
+
+
+
+
+
+
+Wed, Jul 29 at 12:13 PM
+{"timestamp":"2026-07-29T06:36:35.970000UTC","severity":"ERROR","message":"Erro…
+
+
+
+
+Worked for 1m 43s
+
+
+
+This is not the original rule-generation failure. It is a failure while cpo-pricing-services calls the downstream System Config REST service:
+NaturalRuleController
+  → NaturalRuleServiceImpl.generateRuleSpec
+  → GenerateInvokeServicesImpl.invokeGenerateWithContext
+  → RestClientCallServicesImpl.getSystemConfigDetails   ← failure
+BasicAifException is only the wrapper. The attached log does not include the real HTTP status, URL, response body, timeout, or SSL error, so the root cause is in an earlier log line.
+Search the same service logs using the trace ID:
+TRACE_ID='6a699f734115276aa4d57c29633e60c6'
+
+grep -RinC 25 "$TRACE_ID" /scratch/SuperBundle/tomcat/logs/cpo-pricing-services*
+Also search specifically for the likely underlying errors:
+grep -RinE 'getSystemConfigDetails|BasicAifException|HTTP|401|403|404|500|timeout|Connection refused|UnknownHost|SSL' \
+  /scratch/SuperBundle/tomcat/logs/cpo-pricing-services*
+Most likely causes are:
+- System Config service URL missing or wrong for CICDCT
+- Downstream service unavailable, DNS failure, connection refusal, or timeout
+- Invalid/expired authentication credentials
+- HTTP error or invalid response returned by System Config service
+Check the configuration used by RestClientCallServicesImpl.getSystemConfigDetails() and validate that endpoint from the same application server. The line immediately before BasicAifException should reveal the exact status and reason.
+
+
+Jul 29, 12:14 PM
+
+
+
+
+
+
+
+
+Wed, Jul 29 at 3:24 PM
+Name                  Null?    Type              
+ID                    NOT NULL VARCHAR2(80)
+PM_ID                 NOT NULL VARCHAR2(80)
+COMPONENT_SCHEDULE_ID NOT NULL VARCHAR2(80)
+PRODUCT_CONSTRUCT              VARCHAR2(40)
+PRODUCT_CONSTRUCT_ID           VARCHAR2(80)
+ASSOCIATION_DATE               DATE
+ASSOC_STATUS                   VARCHAR2(20)
+REMARKS                        VARCHAR2(4000)
+RECORD_STAT                    VARCHAR2(30)
+AUTH_STAT                      VARCHAR2(30)
+MOD_NO                         NUMBER(4)
+ONCE_AUTH                      VARCHAR2(80)
+MAKER_ID                       VARCHAR2(80)
+MAKER_DT_STAMP                 DATE
+CHECKER_ID                     VARCHAR2(80)
+CHECKER_DT_STAMP               DATE
+MAKER_UTC                      TIMESTAMP(6)
+MAKER_BRANCH                   VARCHAR2(6 CHAR)
+MAKER_TIME_ZONE                VARCHAR2(50 CHAR)
+CHECKER_UTC                    TIMESTAMP(6)
+CHECKER_BRANCH                 VARCHAR2(6 CHAR)
+CHECKER_TIME_ZONE              VARCHAR2(50 CHAR)
+KEY_ID                         VARCHAR2(80)
+ACTION                         VARCHAR2(30)
+MAKER_REMARKS                  VARCHAR2(240)
+CHECKER_REMARKS                VARCHAR2(240)  
+cahnge key_id to 120
+by oracle sql 
+
+
+
+
+
+Show more
+
+Jul 29, 3:24 PM
+
+
+
+
+
+
+KEY_ID is VARCHAR2, so use quotes around 120.
+UPDATE your_table_name
+SET key_id = '120'
+WHERE id = 'your-specific-id';
+
+COMMIT;
+First verify the target row:
+SELECT id, key_id
+FROM your_table_name
+WHERE id = 'your-specific-id';
+Do not omit the WHERE clause unless you intentionally want to change KEY_ID to 120 for every row.
+
+
+Jul 29, 3:24 PM
+
+
+
+
+
+
+
+
+ddl .
+i need oracle ddl
+
+
+
+
+
+
+
+Jul 29, 3:24 PM
+
+
+
+
+
+
+To increase KEY_ID length from VARCHAR2(80) to VARCHAR2(120):
+ALTER TABLE your_table_name
+MODIFY (
+    key_id VARCHAR2(120)
+);
+If you specifically need character semantics:
+ALTER TABLE your_table_name
+MODIFY (
+    key_id VARCHAR2(120 CHAR)
+);
+
+
+Jul 29, 3:25 PM
+
+
+
+
+
+
+
+
+Wed, Jul 29 at 6:14 PM
+cat catalina.2026-07-29.log 29-Jul-2026 12:42:06.292 INFO [main] org.apache.cat…
+
+all good ha
+
+
+
+
+
+
+
+Jul 29, 6:14 PM
+
+
+
+
+
+
+Worked for 50s
+
+
+
+Tomcat startup is good:
+Starting ProtocolHandler ["http-nio-8022"]
+Server startup in [40583] milliseconds
+So cpo-pricing-services is listening on port 8022; there is no fatal startup error in this catalina log.
+But it is not fully “all good” yet:
+- This log proves Tomcat started, not that the application registered with Eureka or that its APIs work.
+- The earlier getSystemConfigDetails error can still occur after startup.
+- You still have an old ZooKeeper setting:
+-Dspring.cloud.stream.kafka.binder.zkNodes=...:2181
+For Kafka 4.2 KRaft, remove this setting. Keep only the broker setting:
+-Dspring.cloud.stream.kafka.binder.brokers=ofss-mum-3618...:9092
+Also verify that ofss-mum-3618 is intentionally the Eureka/config/Kafka host, because this Tomcat process is running on ofss-mum-2441.
+Next checks should be:
+1. Confirm the application health endpoint returns HTTP 200.
+2. Check the application log for successful Eureka registration.
+3. Retry the failing System Config API request.
+The missing Tomcat Native/OpenSSL library message is informational and does not prevent startup.
+
+
+Jul 29, 6:14 PM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Approve for me
+
+Select effortGPT-5.6 TerraUltraNoneMinimalLightMediumHighExtra HighMaxUltraPersistent

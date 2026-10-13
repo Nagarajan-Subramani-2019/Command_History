@@ -1,0 +1,441 @@
+Executing command on AIRemoteServername[ofss-mum-3615.snbomprshared1.gbucdsint02bom.oraclevcn.com]:     echo ofssobp123 | sudo -S echo hello1                                                                                export ART\_USER='fsgbu-banking-ops-user\_in\@oracle.com' export ART\_USER\_URL='fsgbu-banking-ops-user\_in%40oracle.com' export ART\_TOKEN='cmVmdGtuOjAxOjE3OTM5Mzk2NjU6bWIwWHQxcjhsMERWNFVDb011enZZMDJDZ1Nm'  PY="/scratch/AI2/python-3.13.15/bin/python3.13" PIP="/scratch/AI2/python-3.13.15/bin/pip3.13" UVICORN="/scratch/AI2/python-3.13.15/bin/uvicorn" export LD\_LIBRARY\_PATH=/scratch/AI2/python-3.13.15/lib:${LD\_LIBRARY\_PATH:-}  cd "/scratch/AI2"  echo ofssobp123 | sudo  $PIP install --no-deps  [https://${ART\_USER}:${ART\_TOKEN}@artifacthub-iad.oci.oraclecorp.com/fsgbubanking-python-dev-local/release/obma/cmc/26\_1\_0/services/aif\_db\_access\_services/10.2.1/aif\_db\_access\_services-10.2.1-py3-none-any.whl](https://${ART_USER}:${ART_TOKEN}artifacthub-iad.oci.oraclecorp.com/fsgbubanking-python-dev-local/release/obma/cmc/26_1_0/services/aif_db_access_services/10.2.1/aif_db_access_services-10.2.1-py3-none-any.whl) sleep 5   sudo: false [sudo] password for ofssobp:  hello1 /scratch/AI2/python-3.13.15/bin/python3.13: error while loading shared libraries: libpython3.13.so.1.0: cannot open shared object file: No such file or directory 
+[Pipeline] } [Pipeline] // script Post stage [Pipeline] sh + awk '{printf " %d %d %d %d ",substr($0,1,2),substr($0,3,2),substr($0,5,2),((substr($0,1,2)*3600)+(substr($0,3,2)*60)+(substr($0,5,2)))}' + date +%H%M%S
+export ART_USER='fsgbu-banking-ops-user_in@oracle.com'
+export ART_USER_URL='fsgbu-banking-ops-user_in%40oracle.com'
+export ART_TOKEN='cmVmdGtuOjAxOjE3OTM5Mzk2NjU6bWIwWHQxcjhsMERWNFVDb011enZZMDJDZ1Nm'
+PY="${AI_BASE_DIRECTORY}/python-3.13.15/bin/python3.13"
+PIP="${AI_BASE_DIRECTORY}/python-3.13.15/bin/pip3.13"
+UVICORN="${AI_BASE_DIRECTORY}/python-3.13.15/bin/uvicorn"
+export LD_LIBRARY_PATH=${AI_BASE_DIRECTORY}/python-3.13.15/lib:\${LD_LIBRARY_PATH:-}
+cd "${AI_BASE_DIRECTORY}" 
+echo ${serverWord} | sudo  \$PIP install --no-deps  https://\${ART_USER}:\${ART_TOKEN}@artifacthub-iad.oci.oraclecorp.com/fsgbubanking-python-dev-local/release/obma/cmc/26_1_0/services/aif_db_access_services/10.2.1/aif_db_access_services-10.2.1-py3-none-any.whl
+sleep 5
+"""
+
+
+
+
+
+Show more
+
+Sep 11, 6:03 PM
+
+
+
+
+
+
+Your current line still runs pip under sudo without preserving LD_LIBRARY_PATH, so it will fail exactly as before.
+Replace only the install line with this:
+echo "${serverWord}" | sudo -S /usr/bin/env \
+  "LD_LIBRARY_PATH=${AI_BASE_DIRECTORY}/python-3.13.15/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" \
+  "$PIP" install --no-deps \
+  "https://${ART_USER}:${ART_TOKEN}@artifacthub-iad.oci.oraclecorp.com/fsgbubanking-python-dev-local/release/obma/cmc/26_1_0/services/aif_db_access_services/10.2.1/aif_db_access_services-10.2.1-py3-none-any.whl"
+Keep this parent-shell export too:
+export LD_LIBRARY_PATH="${AI_BASE_DIRECTORY}/python-3.13.15/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
+The important difference is sudo -S /usr/bin/env "LD_LIBRARY_PATH=..." "$PIP": env restores the variable specifically for the Python process launched by the pip3.13 script.
+If /scratch/AI2/python-3.13.15 is writable by ofssobp, use the simpler and safer version—no sudo at all:
+"$PIP" install --no-deps "https://${ART_USER}:${ART_TOKEN}@artifacthub-iad.oci.oraclecorp.com/.../aif_db_access_services-10.2.1-py3-none-any.whl"
+Do not use echo ${serverWord} | sudo $PIP ... without -S; and the initial sudo echo hello1 does not authorize the later command.
+
+
+Sep 11, 6:04 PM
+
+
+
+
+
+
+
+
+Skip to content
+Jenkins
+1. cpo_jobs2
+2. RP_OPDS
+3. CD_With_Parametrization
+4. 7.a.CD.AI.Python_Services_new_CD
+5. #121
+6. Console Output
+SearchManage Jenkinsobds
+Status
+Changes
+Console Output
+Edit Build Information
+
+
+
+
+
+
+
+
+
+FailedFailed
+Console Output
+Copy
+Started by user  org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed: WorkflowScript: 149: unexpected token: : @ line 149, column 83.    3.13.15/lib${LD_LIBRARY_PATH:+:${LD_LIBR                                  ^  1 error  	at org.codehaus.groovy.control.ErrorCollector.failIfErrors(ErrorCollector.java:309) 	at org.codehaus.groovy.control.ErrorCollector.addFatalError(ErrorCollector.java:149) 	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:119) 	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:131) 	at org.codehaus.groovy.control.SourceUnit.addError(SourceUnit.java:349) 	at org.codehaus.groovy.antlr.AntlrParserPlugin.transformCSTIntoAST(AntlrParserPlugin.java:225) 	at org.codehaus.groovy.antlr.AntlrParserPlugin.parseCST(AntlrParserPlugin.java:191) 	at org.codehaus.groovy.control.SourceUnit.parse(SourceUnit.java:233) 	at org.codehaus.groovy.control.CompilationUnit$1.call(CompilationUnit.java:189) 	at org.codehaus.groovy.control.CompilationUnit.applyToSourceUnits(CompilationUnit.java:966) 	at org.codehaus.groovy.control.CompilationUnit.doPhaseOperation(CompilationUnit.java:626) 	at org.codehaus.groovy.control.CompilationUnit.processPhaseOperations(CompilationUnit.java:602) 	at org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:579) 	at groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:323) 	at groovy.lang.GroovyClassLoader.parseClass(GroovyClassLoader.java:293) 	at PluginClassLoader for script-security//org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.GroovySandbox$Scope.parse(GroovySandbox.java:162) 	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsGroovyShell.doParse(CpsGroovyShell.java:202) 	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsGroovyShell.reparse(CpsGroovyShell.java:186) 	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsFlowExecution.parseScript(CpsFlowExecution.java:669) 	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsFlowExecution.start(CpsFlowExecution.java:615) 	at PluginClassLoader for workflow-job//org.jenkinsci.plugins.workflow.job.WorkflowRun.run(WorkflowRun.java:341) 	at hudson.model.ResourceController.execute(ResourceController.java:101) 	at hudson.model.Executor.run(Executor.java:460) Finished: FAILURE 
+echo ${serverWord} | sudo -S echo hello1                                                                               
+export ART_USER='fsgbu-banking-ops-user_in@oracle.com'
+export ART_USER_URL='fsgbu-banking-ops-user_in%40oracle.com'
+export ART_TOKEN='cmVmdGtuOjAxOjE3OTM5Mzk2NjU6bWIwWHQxcjhsMERWNFVDb011enZZMDJDZ1Nm'
+PY="${AI_BASE_DIRECTORY}/python-3.13.15/bin/python3.13"
+PIP="${AI_BASE_DIRECTORY}/python-3.13.15/bin/pip3.13"
+UVICORN="${AI_BASE_DIRECTORY}/python-3.13.15/bin/uvicorn"
+export LD_LIBRARY_PATH="${AI_BASE_DIRECTORY}/python-3.13.15/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}"
+cd "${AI_BASE_DIRECTORY}" 
+echo "${serverWord}" | sudo -S /usr/bin/env \
+  "$PIP" install --no-deps ""
+  
+  sleep 5
+
+
+
+
+
+Show more
+
+Sep 11, 6:33 PM
+
+
+
+
+
+
+This build failed before it reached the remote server: Groovy is trying to parse the shell expression ${LD_LIBRARY_PATH:+...} as a Jenkins/Groovy interpolation. The : is not valid in that Groovy expression.
+Use this simpler form—there is no need to append the existing value for this install:
+export LD_LIBRARY_PATH="${AI_BASE_DIRECTORY}/python-3.13.15/lib"
+
+cd "${AI_BASE_DIRECTORY}"
+
+echo "${serverWord}" | sudo -S /usr/bin/env \
+  "LD_LIBRARY_PATH=${AI_BASE_DIRECTORY}/python-3.13.15/lib" \
+  "$PIP" install --no-deps \
+  "https://${ART_USER}:${ART_TOKEN}@artifacthub-iad.oci.oraclecorp.com/fsgbubanking-python-dev-local/release/obma/cmc/26_1_0/services/aif_db_access_services/10.2.1/aif_db_access_services-10.2.1-py3-none-any.whl"
+If this script sits inside a Jenkins """ ... """ Groovy string, escape variables intended for the remote shell. In particular, make the install section:
+export LD_LIBRARY_PATH="\${AI_BASE_DIRECTORY}/python-3.13.15/lib"
+cd "\${AI_BASE_DIRECTORY}"
+
+echo "\${serverWord}" | sudo -S /usr/bin/env \
+  "LD_LIBRARY_PATH=\${AI_BASE_DIRECTORY}/python-3.13.15/lib" \
+  "\${PIP}" install --no-deps \
+  "https://\${ART_USER}:\${ART_TOKEN}@artifacthub-iad.oci.oraclecorp.com/fsgbubanking-python-dev-local/release/obma/cmc/26_1_0/services/aif_db_access_services/10.2.1/aif_db_access_services-10.2.1-py3-none-any.whl"
+Do not use this expression in a Groovy double-quoted string:
+${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+That caused build #121’s compilation error.
+
+
+Sep 11, 6:34 PM
+
+
+
+
+
+
+
+
+
+[Pipeline] { [Pipeline] sshCommand 
+Executing command on AIRemoteServername[ofss-mum-3615.snbomprshared1.gbucdsint02bom.oraclevcn.com]:     echo ofssobp123 | sudo -S echo hello1                                                                                export ART\_USER='fsgbu-banking-ops-user\_in\@oracle.com' export ART\_USER\_URL='fsgbu-banking-ops-user\_in%40oracle.com' export ART\_TOKEN='cmVmdGtuOjAxOjE3OTM5Mzk2NjU6bWIwWHQxcjhsMERWNFVDb011enZZMDJDZ1Nm'  PY="/scratch/AI2/python-3.13.15/bin/python3.13" PIP="/scratch/AI2/python-3.13.15/bin/pip3.13" UVICORN="/scratch/AI2/python-3.13.15/bin/uvicorn"  export LD\_LIBRARY\_PATH="${AI\_BASE\_DIRECTORY}/python-3.13.15/lib" cd "${AI\_BASE\_DIRECTORY}"  echo "${serverWord}" | sudo -S /usr/bin/env   "LD\_LIBRARY\_PATH=${AI\_BASE\_DIRECTORY}/python-3.13.15/lib"   "${PIP}" install --no-deps   "[https://${ART\_USER}:${ART\_TOKEN}@artifacthub-iad.oci.oraclecorp.com/fsgbubanking-python-dev-local/release/obma/cmc/26\_1\_0/services/aif\_db\_access\_services/10.2.1/aif\_db\_access\_services-10.2.1-py3-none-any.whl](https://${ART_USER}:${ART_TOKEN})"      sleep 5   sudo: false [sudo] password for ofssobp:  hello1 /scratch/AI2/python-3.13.15/bin/python3.13: error while loading shared libraries: libpython3.13.so.1.0: cannot open shared object file: No such file or directory 
+[Pipeline] } [Pipeline] // script Post stage [Pipeline] sh + awk '{printf " %d %d %d %d ",substr($0,1,2),substr($0,3,2),substr($0,5,2),((substr($0,1,2)*3600)+(substr($0,3,2)*60)+(substr($0,5,2)))}' + date +%H%M%S [Pipeline] sh 
++ [[ -f Zprev\_time.txt ]] + [[ -s Zprev\_time.txt ]] [Pipeline] sh + echo 3618 - 7.a.CD.AI.Python\_Services\_new\_CD - aif-db access services Install 3618 - 7.a.CD.AI.Python\_Services\_new\_CD - aif-db access services Install + awk -v 'STAGE=3618 - 7.a.CD.AI.Python\_Services\_new\_CD - aif-db access services Install' '{if($8>0){printf "\<tr>\<td>%s\</td> \<td>%d\</td>\</tr> \n",STAGE,$4-$8;}else{printf "\<tr>\<td>%s\</td> \<td>0\</td>\</tr> \n",STAGE;}}' + paste Zcurr\_time.txt Zprev\_time.txt [Pipeline] sh + [[ -f Zprev\_time.txt ]] + [[ -s Zprev\_time.txt ]] + cat Zcurr\_time.txt [Pipeline] sh + tail -1 ZTotal\_time\_Taken\_Process.txt + sed 's/\\///g;s/\<tr>//g;s/\<td>//g' + awk '{print $NF}' Did you forget the \`def\` keyword? notifySlack seems to be setting a field named stage\_run\_time (to a value of type String) which could lead to memory leaks or other issues. Did you forget the \`def\` keyword? notifySlack seems to be setting a field named counter (to a value of type Integer) which could lead to memory leaks or other issues. [Pipeline] echo counter is => 2 [Pipeline] slackSend Slack Send Pipeline step running, values are - baseUrl: [https://gbu-core.slack.com/services/hooks/jenkins-ci/](https://gbu-core.slack.com/services/hooks/jenkins-ci/), teamDomain: gbu-core, channel: opds-build-support, color: #00FF00, botUser: false, tokenCredentialId: ygJ4x3wKprlMUTJCZwC6O0X0, notifyCommitters: false, iconEmoji: \<empty>, username: \<empty>, timestamp: \<empty> 
+[Pipeline] } [Pipeline] // stage [Pipeline] stage [Pipeline] { (Bring up aif-db access after killing) [Pipeline] script [Pipeline] {
+
+
+
+
+
+Show more
+
+Sep 11, 6:36 PM
+
+
+
+
+
+
+The /usr/bin/env approach cannot work with sudo here.
+When sudo starts Python as root, Linux treats it as a privileged execution and deliberately ignores LD_LIBRARY_PATH. That is why the same missing libpython3.13.so.1.0 error remains even though the variable appears in the command.
+Use the non-root Python process instead:
+export LD_LIBRARY_PATH="${AI_BASE_DIRECTORY}/python-3.13.15/lib"
+
+cd "${AI_BASE_DIRECTORY}"
+
+"$PY" -m pip install --no-deps \
+  "https://${ART_USER}:${ART_TOKEN}@artifacthub-iad.oci.oraclecorp.com/fsgbubanking-python-dev-local/release/obma/cmc/26_1_0/services/aif_db_access_services/10.2.1/aif_db_access_services-10.2.1-py3-none-any.whl"
+So remove this entire pattern:
+echo "${serverWord}" | sudo -S /usr/bin/env ...
+Your Python tree is already owned by ofssobp, based on the earlier ls -l output, so sudo should not be required.
+If installation truly must be root-owned, the durable server fix is to register the library directory with the dynamic linker as root:
+echo "/scratch/AI2/python-3.13.15/lib" | sudo tee /etc/ld.so.conf.d/python-3.13.15.conf
+sudo ldconfig
+After that, root and non-root processes can run /scratch/AI2/python-3.13.15/bin/python3.13 without relying on LD_LIBRARY_PATH.
+Also use "$PY" -m pip, not "$PIP"—it guarantees that install, package checks, imports, and Uvicorn run from the same Python installation.
+
+
+Sep 11, 6:36 PM
+
+
+
+
+
+
+
+
+ /scratch/AI2/python-3.13.15/bin/python3.13 --version
+/scratch/AI2/python-3.13.15/bin/python3.13: error while loading shared libraries: libpython3.13.so.1.0: cannot open shared object file: No such file or directory
+[ofssobp@ofss-mum-3615 ~]$
+[ofssobp@ofss-mum-3615 ~]$
+[ofssobp@ofss-mum-3615 ~]$ ls -ltr /scratch/AI2/python-3.13.15/bin/python3.13
+-rwxr-xr-x 1 ofssobp dba 34784 Sep  8 07:06 /scratch/AI2/python-3.13.15/bin/python3.13
+[ofssobp@ofss-mum-3615 ~]$
+[ofssobp@ofss-mum-3615 ~]$
+
+
+
+
+
+
+
+Sep 11, 6:40 PM
+
+
+
+
+
+
+That confirms the Python binary itself requires the private Python library directory. Run this exact one-line test:
+LD_LIBRARY_PATH=/scratch/AI2/python-3.13.15/lib \
+  /scratch/AI2/python-3.13.15/bin/python3.13 --version
+Also confirm the required library really exists:
+ls -l /scratch/AI2/python-3.13.15/lib/libpython3.13.so.1.0
+If the first command succeeds, make it persistent for this account by adding this to ~/.bash_profile:
+export LD_LIBRARY_PATH=/scratch/AI2/python-3.13.15/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+Then run:
+source ~/.bash_profile
+For Jenkins, export the same variable before every Python command. Do not use sudo for its pip command, because privileged execution ignores LD_LIBRARY_PATH.
+If libpython3.13.so.1.0 does not exist, the Python installation is incomplete or was built/copied incorrectly; the missing shared library must be restored before any python3.13 command can run.
+
+
+Sep 11, 6:41 PM
+
+
+
+
+
+
+
+
+[sudo] password for ofssobp:  hello1 /scratch/AI2/python-3.13.15/bin/python3.13: Error while finding module specification for '/scratch/AI2/python-3.13.15/bin/pip3.13' (ModuleNotFoundError: No module named '/scratch/AI2/python-3') 
+[Pipeline] }
+in jenkins groovy syntax
+export LD_LIBRARY_PATH=/scratch/AI2/python-3.13.15/lib
+PY="${AI_BASE_DIRECTORY}/python-3.13.15/bin/python3.13"
+PIP="${AI_BASE_DIRECTORY}/python-3.13.15/bin/pip3.13"
+UVICORN="${AI_BASE_DIRECTORY}/python-3.13.15/bin/uvicorn"
+#export LD_LIBRARY_PATH="${AI_BASE_DIRECTORY}/python-3.13.15/lib"
+cd "${AI_BASE_DIRECTORY}"
+\$PY -m \$PIP install --no-deps \
+  "https://\${ART_USER}:\${ART_TOKEN}@artifacthub-iad.oci.oraclecorp.com/fsgbubanking-python-dev-local/release/obma/cmc/26_1_0/services/aif_db_access_services/10.2.1/aif_db_access_services-10.2.1-py3-none-any.whl"
+  
+
+
+
+
+
+Show more
+
+Sep 11, 6:44 PM
+
+
+
+
+
+
+You have fixed the shared-library issue. This new error is from this incorrect command:
+$PY -m $PIP install ...
+-m expects a Python module name, not the path to the pip3.13 executable. Python tries to import /scratch/AI2/.../pip3.13 as a module and fails.
+Use exactly:
+export LD_LIBRARY_PATH=/scratch/AI2/python-3.13.15/lib
+
+PY="${AI_BASE_DIRECTORY}/python-3.13.15/bin/python3.13"
+
+cd "${AI_BASE_DIRECTORY}"
+
+\$PY -m pip install --no-deps \
+  "https://\${ART_USER}:\${ART_TOKEN}@artifacthub-iad.oci.oraclecorp.com/fsgbubanking-python-dev-local/release/obma/cmc/26_1_0/services/aif_db_access_services/10.2.1/aif_db_access_services-10.2.1-py3-none-any.whl"
+Remove this variable; it is not needed:
+PIP="${AI_BASE_DIRECTORY}/python-3.13.15/bin/pip3.13"
+Key correction:
+$PY -m pip
+not:
+$PY -m $PIP
+In Jenkins Groovy """ ... """, use \$PY (one backslash), not \\$PY.
+
+
+Sep 11, 6:44 PM
+
+
+
+
+
+
+
+
+Skip to content Jenkins cpo_jobs2 RP_OPDS CD_With_Parametrization 7.a.CD.AI.Pyt…
+
+  stage('Bring up aif-db access after killing'){
+ when { expression {  params.STAGE_13 } }
+        steps{
+        script{
+
+                def ServerConnectionObject = [:]
+                ServerConnectionObject.name = "AIRemoteServername"
+                ServerConnectionObject.host = "$AIRemoteServername"
+                ServerConnectionObject.user = "ofssobp"
+                ServerConnectionObject.password = "ofssobp123"
+                ServerConnectionObject.allowAnyHosts = true
+                if (env.AIRemoteServername == 'ofss-mum-1159.snbomprshared1.gbucdsint02bom.oraclevcn.com') {
+                    ServerConnectionObject.user = "ofss"
+                    ServerConnectionObject.password = "Oracle@123"
+                }
+  
+def serverWord=ServerConnectionObject.password
+env.serverWord=serverWord
+def PORT_INFO = ['7911']
+for (port in PORT_INFO) {
+env.port=port
+def ActiveProcess_count = 0
+ActiveProcess_count = sshCommand remote: ServerConnectionObject, command: "ps -eaf | grep python   | grep -v grep | awk -v PORT=${port} '{ for(i=1;i<=NF;i++)if($i=="--port" && $(i+1)==PORT){print $0}}' | wc -l"
+if (ActiveProcess_count.toInteger() > 0)
+sshCommand remote: ServerConnectionObject, command: "ACTIVE_PROCESS_TO_KILL=ps -eaf | grep python   | grep -v grep | awk -v PORT=${port} '{ for(i=1;i<=NF;i++)if(\$i==\"--port\" && \$(i+1)==PORT){print \$0}}' | awk '{print \$2}';echo $ACTIVE_PROCESS_TO_KILL;kill -9 $ACTIVE_PROCESS_TO_KILL || echo _Failed_to_Kill_Process;"
+sh 'sleep 1'
+              }
+sshCommand remote: ServerConnectionObject, command: """
+sleep 5
+PY="${AI_BASE_DIRECTORY}/python-3.13.15/bin/python3.13"
+PIP="${AI_BASE_DIRECTORY}/python-3.13.15/bin/pip3.13"
+UVICORN="${AI_BASE_DIRECTORY}/python-3.13.15/bin/uvicorn"
+export LD_LIBRARY_PATH=${AI_BASE_DIRECTORY}/python-3.13.15/lib:${LD_LIBRARY_PATH:-}
+echo ${serverWord} | sudo -S echo hello1
+sudo echo hello2
+ls -l ${AI_BASE_DIRECTORY}/python-3.13.15/lib/libpython3.13.so.1.0
+ls -l ${AI_BASE_DIRECTORY}/python-3.13.15/lib/libssl.so.3
+ls -l ${AI_BASE_DIRECTORY}/python-3.13.15/lib/libcrypto.so.3
+$PY -c "from cryptography.hazmat.primitives import hashes; print('cryptography OK')"
+cd ${AI_BASE_DIRECTORY}
+a=1
+$PY -m pip show $UVICORN && a=0 || echo not_Found1
+(( a )) && $UVICORN -v  &&  a=0 || echo not_Found2
+(( a )) && which -a $UVICORN &&  a=0 || echo not_Found3
+(( a )) && $PY -m pip install uvicorn==0.34.2
+ls -l $UVICORN
+which  $UVICORN
+$UVICORN --version
+SERVICE_PACKAGE="aif-db-access-services-10.2.0"
+SERVICE_MODULE="aif-db-access-services-10.2.0"
+echo "Package:"
+$PY -m pip show $SERVICE_PACKAGE
+echo "Import test:"
+$PY -c "from ${SERVICE_MODULE}.main import app; print('Import OK')"
+python -m pip show aif-db-access-services
+python -c "from aif_db_access_services.main import app; print('Import OK')"
+export x=11
+export SSL_CERT_FILE=${AI_BASE_DIRECTORY}/aif-final-trust-bundle.pem
+for i in aif-db-access-services-10.2.0
+do
+echo nohup  $UVICORN $i.main:app --port 79${x} --loop asyncio --host $AIRemoteServername > ${i}_nohup.out
+JENKINS_NODE_COOKIE=dontKillMe nohup  $UVICORN $i.main:app --port 79${x} --loop asyncio --host $AIRemoteServername > ${i}_nohup.out 2>&1 &
+(( x=x+1 ))
+done
+"""
+sh ' sleep 5'
+for (port in PORT_INFO) {
+env.port=port
+def ActiveProcess_count = 0
+ActiveProcess_count = sshCommand remote: ServerConnectionObject, command: "ps -eaf | grep python   | grep -v grep | awk -v PORT=${port} '{ for(i=1;i<=NF;i++)if($i=="--port" && $(i+1)==PORT){print $0}}' | wc -l"
+if (ActiveProcess_count.toInteger() > 0)
+sshCommand remote: ServerConnectionObject, command: "ACTIVE_PROCESS_TO_KILL=ps -eaf | grep python   | grep -v grep | awk -v PORT=${port} '{ for(i=1;i<=NF;i++)if(\$i==\"--port\" && \$(i+1)==PORT){print \$0}}' | awk '{print \$2}';echo $ACTIVE_PROCESS_TO_KILL;echo $ACTIVE_PROCESS_TO_KILL || echo _No_Process_actively_running;"
+sh 'sleep 1'
+              }
+
+              
+              }
+        }
+        post {
+        failure {
+        notifySlack("${SHORT_SERVER_NAME} - ${env.JOB_NAME_TRIM} - ${env.STAGE_NAME}", 'FAILURE')
+        }
+        success {
+        notifySlack("${SHORT_SERVER_NAME} - ${env.JOB_NAME_TRIM} - ${env.STAGE_NAME}", 'SUCCESS')
+        }
+        }
+              }  
+
+
+
+
+
+Show more
+
+Sep 11, 6:46 PM
+
+
+
+
+
+
+Replace the remote sshCommand block with this. It removes sudo, uses the correct Python module commands, uses the valid module name, and escapes remote-shell variables correctly inside Jenkins """ ... """.
+sshCommand remote: ServerConnectionObject, command: """
+set -e
+
+export LD_LIBRARY_PATH="${AI_BASE_DIRECTORY}/python-3.13.15/lib"
+
+PY="${AI_BASE_DIRECTORY}/python-3.13.15/bin/python3.13"
+SERVICE_PACKAGE="aif-db-access-services"
+SERVICE_MODULE="aif_db_access_services"
+PORT="7911"
+LOG_FILE="aif-db-access-services_nohup.out"
+
+cd "${AI_BASE_DIRECTORY}"
+
+ls -l "${AI_BASE_DIRECTORY}/python-3.13.15/lib/libpython3.13.so.1.0"
+
+"\$PY" --version
+"\$PY" -c "from cryptography.hazmat.primitives import hashes; print('cryptography OK')"
+
+if ! "\$PY" -m pip show uvicorn > /dev/null 2>&1; then
+    "\$PY" -m pip install "uvicorn==0.34.2"
+fi
+
+"\$PY" -m uvicorn --version
+"\$PY" -m pip show "\$SERVICE_PACKAGE"
+"\$PY" -c "from \${SERVICE_MODULE}.__main__ import app; print('Import OK')"
+
+export SSL_CERT_FILE="${AI_BASE_DIRECTORY}/aif-final-trust-bundle.pem"
+
+JENKINS_NODE_COOKIE=dontKillMe nohup "\$PY" -m uvicorn \
+    "\${SERVICE_MODULE}.__main__:app" \
+    --port "\$PORT" \
+    --loop asyncio \
+    --host 0.0.0.0 \
+    > "\$LOG_FILE" 2>&1 &
+
+sleep 5
+
+if ! ps -eaf | grep '[p]ython' | grep -q -- "--port \$PORT"; then
+    echo "Service did not start. Log follows:"
+    cat "\$LOG_FILE"
+    exit 1
+fi
+"""
+The critical corrections are:
+- Use "\$PY" -m pip, not "\$PY" -m "\$PIP".
+- Use aif_db_access_services, not aif-db-access-services, for imports and Uvicorn.
+- Use "\$PY" -m uvicorn, avoiding the separate uvicorn executable.
+- Remove sudo; root execution ignores LD_LIBRARY_PATH.
+- Do not use uvicorn -v; python -m uvicorn --version is valid.
+- Remove echo ... | sudo diagnostics. They expose credentials and do not grant sudo to later commands.
+Rotate the remote password and artifact token shown in earlier Jenkins logs, then store them as masked Jenkins credentials.
+
+
+Sep 11, 6:47 PM

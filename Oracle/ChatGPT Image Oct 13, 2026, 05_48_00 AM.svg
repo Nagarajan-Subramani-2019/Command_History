@@ -1,0 +1,195 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1310" viewBox="0 0 1800 1310" role="img" aria-labelledby="title desc">
+  <title id="title">New AIF Java Services Deployment and Startup Flow</title>
+  <desc id="desc">A Java 25 AIF deployment flow. A trusted runtime, Config Server and Eureka are prepared first. In OBMA mode, discovery starts first, followed by aif-llm-service, the target aif-agent-core-services runtime, the database MCP server for SQLcl flows, and the optional ref-mcp-client.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7fbff"/>
+      <stop offset="1" stop-color="#f9f7ff"/>
+    </linearGradient>
+    <linearGradient id="foundation" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e1f7f4"/>
+      <stop offset="1" stop-color="#caeee8"/>
+    </linearGradient>
+    <linearGradient id="platform" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8f1ff"/>
+      <stop offset="1" stop-color="#d9e8ff"/>
+    </linearGradient>
+    <linearGradient id="llm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e9fbf7"/>
+      <stop offset="1" stop-color="#d8f4ec"/>
+    </linearGradient>
+    <linearGradient id="agent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e9f3ff"/>
+      <stop offset="1" stop-color="#d4e7ff"/>
+    </linearGradient>
+    <linearGradient id="database" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4edff"/>
+      <stop offset="1" stop-color="#e9dcff"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#24364b" flood-opacity="0.10"/>
+    </filter>
+    <filter id="small-shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#24364b" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow-teal" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0 L10 5 L0 10 z" fill="#167c81"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0 L10 5 L0 10 z" fill="#2579b7"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0 L10 5 L0 10 z" fill="#7757b7"/>
+    </marker>
+    <style>
+      .title{font-family:Arial,Helvetica,sans-serif;font-size:40px;font-weight:700;fill:#132c46}
+      .subtitle{font-family:Arial,Helvetica,sans-serif;font-size:19px;fill:#5a6e81}
+      .section-title{font-family:Arial,Helvetica,sans-serif;font-size:23px;font-weight:700;fill:#173a49}
+      .section-subtitle{font-family:Arial,Helvetica,sans-serif;font-size:15px;fill:#4e6976}
+      .card-title{font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700;fill:#18344b}
+      .card-text{font-family:Arial,Helvetica,sans-serif;font-size:15px;fill:#385467}
+      .card-small{font-family:Arial,Helvetica,sans-serif;font-size:13px;fill:#526b7d}
+      .mono{font-family:Consolas,"Courier New",monospace;font-size:13px;font-weight:700;fill:#244258}
+      .step{font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;fill:#fff;text-anchor:middle;dominant-baseline:middle}
+      .badge{font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;fill:#fff;text-anchor:middle;dominant-baseline:middle}
+      .service-title{font-family:Arial,Helvetica,sans-serif;font-size:23px;font-weight:700;fill:#173a49}
+      .service-subtitle{font-family:Arial,Helvetica,sans-serif;font-size:15px;fill:#456378}
+      .service-detail{font-family:Arial,Helvetica,sans-serif;font-size:14px;fill:#385467}
+      .service-label{font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;fill:#5a6e81;letter-spacing:1px}
+      .timeline{font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;fill:#294b5d;text-anchor:middle}
+      .timeline-small{font-family:Arial,Helvetica,sans-serif;font-size:12px;fill:#5a7182;text-anchor:middle}
+      .footer{font-family:Arial,Helvetica,sans-serif;font-size:13px;fill:#5b7080}
+    </style>
+  </defs>
+
+  <rect width="1800" height="1310" fill="url(#background)"/>
+  <path d="M0 132H1800" stroke="#dce7ee" stroke-width="2"/>
+  <text x="90" y="68" class="title">New AIF Java Services</text>
+  <text x="90" y="101" class="subtitle">Consolidated cloud deployment: trusted Java runtime, shared platform services, ordered discovery, and renamed standalone AIF services</text>
+  <rect x="1445" y="45" width="265" height="47" rx="23.5" fill="#e3f4ee" stroke="#bde5d7"/>
+  <circle cx="1475" cy="68.5" r="8" fill="#25a775"/>
+  <text x="1494" y="74" class="card-text" font-weight="700">26.1.0 TARGET RUNTIME</text>
+
+  <!-- Runtime foundation -->
+  <rect x="90" y="166" width="1620" height="182" rx="22" fill="url(#foundation)" stroke="#9ed9d3" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="90" y="166" width="12" height="182" rx="6" fill="#167c81"/>
+  <text x="132" y="210" class="section-title">Runtime and trust foundation</text>
+  <text x="132" y="237" class="section-subtitle">Prepare the Java environment once before starting any AIF service</text>
+  <g filter="url(#small-shadow)">
+    <rect x="132" y="263" width="469" height="58" rx="12" fill="#fff" stroke="#b6e0dc"/>
+    <rect x="666" y="263" width="469" height="58" rx="12" fill="#fff" stroke="#b6e0dc"/>
+    <rect x="1200" y="263" width="469" height="58" rx="12" fill="#fff" stroke="#b6e0dc"/>
+  </g>
+  <circle cx="162" cy="292" r="15" fill="#167c81"/><text x="162" y="293" class="step">1</text>
+  <text x="190" y="289" class="card-title">Use the pinned Java 25 runtime</text>
+  <text x="190" y="310" class="card-text">Launch all Java JARs with the approved JDK installation</text>
+  <circle cx="696" cy="292" r="15" fill="#167c81"/><text x="696" y="293" class="step">2</text>
+  <text x="724" y="289" class="card-title">Import the platform CA certificate</text>
+  <text x="724" y="310" class="card-text">Add it to the JDK 25 truststore and validate the TLS chain</text>
+  <circle cx="1230" cy="292" r="15" fill="#167c81"/><text x="1230" y="293" class="step">3</text>
+  <text x="1258" y="289" class="card-title">Validate deployable and runtime inputs</text>
+  <text x="1258" y="310" class="card-text">JAR, host, schema, endpoint, and log-path values are available</text>
+  <path d="M601 292H654M1135 292H1188" stroke="#167c81" stroke-width="3" marker-end="url(#arrow-teal)"/>
+
+  <!-- Shared platform configuration -->
+  <rect x="90" y="388" width="1620" height="181" rx="22" fill="url(#platform)" stroke="#accbea" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="90" y="388" width="12" height="181" rx="6" fill="#2579b7"/>
+  <text x="132" y="432" class="section-title">Shared platform configuration</text>
+  <text x="132" y="459" class="section-subtitle">External configuration and discovery are used by every service in OBMA mode</text>
+  <g filter="url(#small-shadow)">
+    <rect x="132" y="485" width="469" height="57" rx="12" fill="#fff" stroke="#bfd8f2"/>
+    <rect x="666" y="485" width="469" height="57" rx="12" fill="#fff" stroke="#bfd8f2"/>
+    <rect x="1200" y="485" width="469" height="57" rx="12" fill="#fff" stroke="#bfd8f2"/>
+  </g>
+  <circle cx="162" cy="513" r="15" fill="#2579b7"/><text x="162" y="514" class="step">1</text>
+  <text x="190" y="510" class="card-title">Config Server :8001</text>
+  <text x="190" y="531" class="card-text">Reads external service configuration at startup</text>
+  <circle cx="696" cy="513" r="15" fill="#2579b7"/><text x="696" y="514" class="step">2</text>
+  <text x="724" y="510" class="card-title">Eureka Registry :8003 (HTTP)</text>
+  <text x="724" y="531" class="card-text">Registers and resolves service IDs in OBMA mode</text>
+  <circle cx="1230" cy="513" r="15" fill="#2579b7"/><text x="1230" y="514" class="step">3</text>
+  <text x="1258" y="510" class="card-title">Database settings and service logs</text>
+  <text x="1258" y="531" class="card-text">Runtime-only endpoints, schemas, and observability paths</text>
+
+  <!-- Startup order -->
+  <path d="M900 569V598" fill="none" stroke="#668392" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <text x="90" y="620" class="section-title">OBMA startup order</text>
+  <text x="90" y="647" class="section-subtitle">Start discovery first; then start services in dependency order</text>
+  <line x1="299" y1="684" x2="1501" y2="684" stroke="#acc2d2" stroke-width="3"/>
+  <path d="M419 684H529M666 684H776M913 684H1023M1160 684H1270" stroke="#668392" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <circle cx="235" cy="684" r="38" fill="#2579b7" filter="url(#small-shadow)"/><text x="235" y="681" class="badge">1</text>
+  <text x="235" y="740" class="timeline">Service discovery</text>
+  <text x="235" y="759" class="timeline-small">Eureka is available</text>
+
+  <circle cx="602" cy="684" r="38" fill="#1a9a84" filter="url(#small-shadow)"/><text x="602" y="681" class="badge">2</text>
+  <text x="602" y="740" class="timeline">aif-llm-service</text>
+  <text x="602" y="759" class="timeline-small">renamed standalone service</text>
+
+  <circle cx="849" cy="684" r="38" fill="#2579b7" filter="url(#small-shadow)"/><text x="849" y="681" class="badge">3</text>
+  <text x="849" y="740" class="timeline">aif-agent-core-services</text>
+  <text x="849" y="759" class="timeline-small">target consolidated runtime</text>
+
+  <circle cx="1096" cy="684" r="38" fill="#7757b7" filter="url(#small-shadow)"/><text x="1096" y="681" class="badge">4</text>
+  <text x="1096" y="740" class="timeline">database MCP server</text>
+  <text x="1096" y="759" class="timeline-small">when SQLcl tools are required</text>
+
+  <circle cx="1343" cy="684" r="38" fill="#7d8e9b" filter="url(#small-shadow)"/><text x="1343" y="681" class="badge">5</text>
+  <text x="1343" y="740" class="timeline">ref-mcp-client</text>
+  <text x="1343" y="759" class="timeline-small">optional client and flow validation</text>
+
+  <!-- Service cards -->
+  <rect x="90" y="803" width="500" height="330" rx="22" fill="url(#llm)" stroke="#a3dccc" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="90" y="803" width="12" height="330" rx="6" fill="#1a9a84"/>
+  <rect x="126" y="834" width="117" height="28" rx="14" fill="#1a9a84"/><text x="184.5" y="853" class="badge">STARTS SECOND</text>
+  <text x="126" y="904" class="service-title">aif-llm-service</text>
+  <text x="126" y="932" class="service-subtitle">Renamed standalone LLM service • port 60050</text>
+  <rect x="126" y="955" width="174" height="30" rx="15" fill="#d3f2e9"/><text x="213" y="975" class="mono" text-anchor="middle">APP ID  AIFLLM</text>
+  <line x1="126" y1="1005" x2="554" y2="1005" stroke="#b8dfd4"/>
+  <text x="126" y="1036" class="service-label">SERVICE ROLE</text>
+  <text x="126" y="1061" class="service-detail">LLM completions and chat through the adopted</text>
+  <text x="126" y="1083" class="service-detail">/aif-llm-service context path.</text>
+  <text x="126" y="1114" class="service-label">RUNTIME CONTRACT</text>
+  <text x="126" y="1137" class="service-detail">Cloud DIS, secure-store, SAT, and OCI GenAI</text>
+  <text x="126" y="1159" class="service-detail">configuration; registered in Eureka in OBMA mode.</text>
+
+  <rect x="650" y="783" width="500" height="370" rx="22" fill="url(#agent)" stroke="#8dbfe8" stroke-width="3" filter="url(#shadow)"/>
+  <rect x="650" y="783" width="12" height="370" rx="6" fill="#2579b7"/>
+  <rect x="686" y="814" width="133" height="28" rx="14" fill="#2579b7"/><text x="752.5" y="833" class="badge">TARGET RUNTIME</text>
+  <rect x="1017" y="814" width="97" height="28" rx="14" fill="#d5e9fc"/><text x="1065.5" y="833" class="mono" text-anchor="middle">PORT 60084</text>
+  <text x="686" y="884" class="service-title">aif-agent-core-services</text>
+  <text x="686" y="912" class="service-subtitle">Consolidated platform runtime and adopted AIF API surface</text>
+  <rect x="686" y="935" width="228" height="30" rx="15" fill="#d4e8fb"/><text x="800" y="955" class="mono" text-anchor="middle">APP ID  AIFAGENTCORE</text>
+  <line x1="686" y1="985" x2="1114" y2="985" stroke="#b6d3ed"/>
+  <text x="686" y="1015" class="service-label">CANONICAL CONTEXT</text>
+  <text x="686" y="1040" class="mono">/aif-agent-core-services</text>
+  <text x="686" y="1070" class="service-label">CONSOLIDATED RESPONSIBILITIES</text>
+  <text x="686" y="1094" class="service-detail">Config, document system config, use-case invocation,</text>
+  <text x="686" y="1116" class="service-detail">utility, MCP registry, and metadata MCP surfaces.</text>
+  <text x="686" y="1146" class="service-label">PERSISTENCE CONTRACT</text>
+  <text x="686" y="1170" class="service-detail">Foundation PLATO lookup + jdbc/AIFAGENTCORE</text>
+  <text x="686" y="1192" class="service-detail">mapping to the PLATOAIF schema.</text>
+
+  <rect x="1210" y="803" width="500" height="330" rx="22" fill="url(#database)" stroke="#c5a9ed" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="1210" y="803" width="12" height="330" rx="6" fill="#7757b7"/>
+  <rect x="1246" y="834" width="180" height="28" rx="14" fill="#7757b7"/><text x="1336" y="853" class="badge">SQLCL FLOWS ONLY</text>
+  <text x="1246" y="904" class="service-title">aif-database-mcp-server</text>
+  <text x="1246" y="932" class="service-subtitle">Renamed standalone database MCP service</text>
+  <rect x="1246" y="955" width="258" height="30" rx="15" fill="#eadcff"/><text x="1375" y="975" class="mono" text-anchor="middle">APP ID  AIFDATABASEMCP</text>
+  <line x1="1246" y1="1005" x2="1674" y2="1005" stroke="#dac9f2"/>
+  <text x="1246" y="1036" class="service-label">SERVICE ROLE</text>
+  <text x="1246" y="1061" class="service-detail">Database query and MCP tool paths under</text>
+  <text x="1246" y="1083" class="service-detail">/aif-database-mcp-server.</text>
+  <text x="1246" y="1114" class="service-label">RUNTIME CONTRACT</text>
+  <text x="1246" y="1137" class="service-detail">PLATO/foundation DB parameters and the database</text>
+  <text x="1246" y="1159" class="service-detail">MCP schema for SQLcl tool execution.</text>
+
+  <!-- Optional client -->
+  <path d="M900 1153V1180" fill="none" stroke="#668392" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <rect x="426" y="1191" width="948" height="70" rx="18" fill="#f1f4f6" stroke="#bcc9d2" stroke-width="2" stroke-dasharray="8 6" filter="url(#small-shadow)"/>
+  <rect x="455" y="1211" width="93" height="28" rx="14" fill="#7d8e9b"/><text x="501.5" y="1230" class="badge">OPTIONAL</text>
+  <text x="578" y="1219" class="card-title">ref-mcp-client</text>
+  <text x="578" y="1241" class="card-text">Starts after agent core when validating MCP chat-turn or SQLcl flows; routes to agent core, LLM, and database MCP through Eureka service IDs.</text>
+
+  <text x="90" y="1291" class="footer">Non-OBMA mode: use direct host/port routing and disable Eureka. Credentials are injected at runtime and are intentionally not shown.</text>
+</svg>

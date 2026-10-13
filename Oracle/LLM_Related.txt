@@ -1,0 +1,382 @@
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+05:15:26:702 | aif-llm-service | startup |  |  |  |  |  |  |  | ERROR | [,] | o.s.b.d.LoggingFailureAnalysisReporter.report |
+APPLICATION FAILED TO START
+Description:
+Web server failed to start. Port 60050 was already in use.
+Action:
+Identify and stop the process that's listening on port 60050 or configure this application to listen on another port.
+ .
+
+
+
+
+
+
+
+Aug 10, 10:50 AM
+
+
+
+
+
+
+Port 60050 is already occupied by another process.
+Find the process:
+ss -ltnp | grep ':60050'
+or, if ss is unavailable:
+netstat -ltnp | grep ':60050'
+Note the PID, inspect it, then stop it only if it is the old/unwanted service:
+ps -fp <PID>
+kill <PID>
+If it does not stop cleanly:
+kill -9 <PID>
+Alternatively, keep that process running and start this application on a free port by changing the JVM option:
+-Dserver.port=60051
+Your log says the application is actually configured for 60050, so make sure the command or its environment (JAVA_ARGS, config file, or deployment script) is not overriding the intended port.
+
+
+Aug 10, 10:50 AM
+
+
+
+
+
+
+
+
+      serverInfoFor3618: [
+        primaryServerName  : 'ofss-mum-3618.snbomprshared1.gbucdsint02bom.oraclevcn.com',
+        DBINFO             : [dbServerName: 'ofss-mum-3722.snbomprshared1.gbucdsint02bom.oraclevcn.com', dbPort: 1521, dbServiceName: 'OPDSPDB',dbServiceName2: 'OPDSPDB'],
+        secondaryServerName: 'ofss-mum-2441.snbomprshared1.gbucdsint02bom.oraclevcn.com',
+        AIServerName       : 'ofss-mum-2003.snbomprshared1.gbucdsint02bom.oraclevcn.com',
+        ALM_INFO           : 'RP_OPDS'
+    ],
+	
+	to 
+	
+	 serverInfoFor5239: [
+        primaryServerName  : 'ofss-mum-5239.snbomprshared2.gbucdsint02bom.oraclevcn.com',
+        DBINFO             : [dbServerName: 'ofss-mum-3606.snbomprshared1.gbucdsint02bom.oraclevcn.com', dbPort: 1521, dbServiceName: 'PDBOPDS',dbServiceName2: 'PDBOPDS'],
+        secondaryServerName: 'ofss-mum-3648.snbomprshared1.gbucdsint02bom.oraclevcn.com',
+        AIServerName       : 'ofss-mum-3648.snbomprshared1.gbucdsint02bom.oraclevcn.com',
+        ALM_INFO           : 'RP_OPDS'
+    ],
+   nohup "/scratch/software/jdk-25.0.3/bin/java" 
+  -Duser.home=/scratch/ofssobp 
+  -Ddeploy.environment=DEV 
+  -Dserver.port=60050  
+  -Dspring.application.name=aif-llm-service 
+  -DappId=AIFLLM 
+  -Dplato.jndi.lookup=false 
+  -Dplato-services-eureka-uri="" 
+  -Deureka.client.serviceUrl.defaultZone=  
+  -Deureka.instance.hostname="ofss-mum-2003.snbomprshared1.gbucdsint02bom.oraclevcn.com" 
+  -Deureka.instance.instance-id="ofss-mum-2003.snbomprshared1.gbucdsint02bom.oraclevcn.com:aif-llm-service:60050" 
+  -Deureka.instance.nonSecurePort="60050" 
+  -Dspring.ai.oci.genai.authentication.config-file="/scratch/ofssobp/.oci/config" 
+  -Dspring.ai.oci.genai.authentication.configFile="/scratch/ofssobp/.oci/config" 
+  -DOCI_CONFIG_FILE="/scratch/ofssobp/.oci/config" 
+  -Dplato.service.logging.path="/scratch/work_area/logs/aif-llm-service" 
+  -Dplato.service.logging.appender=STDOUT 
+  -Dplato.service.logging.level=INFO 
+  -jar "/scratch/obma_installer/deployables/apps/snapshot/aif-llm-service-snapshot.jar" > aif-llm-service-snapshot.log &
+JAVA_BIN="/scratch/software/jdk-25.0.3/bin/java"
+JAR="/scratch/obma_installer/deployables/apps/snapshot/aif-agent-core-services-snapshot.jar"
+LOG_DIR="/scratch/work_area/logs/aif-agent-core-services"
+mkdir -p "$LOG_DIR"
+export PLATO_DB_PASSWORD=welcome1
+export PLATOAIF_DB_PASSWORD=welcome1
+nohup "$JAVA_BIN" 
+  -Duser.home="/scratch/ofssobp" 
+  -Ddeploy.environment=cloud 
+  -Denvironment.name=CICDCT 
+  -Dserver.port=60084 
+  -Dspring.application.name=aif-agent-core-services 
+  -Dspring.main.allow-circular-references=true 
+  -Dplato.jndi.lookup=false 
+  -DappId=AIFAGENTCORE 
+  -Dplato_db_driver=oracle.jdbc.OracleDriver 
+  -Dplato_db_url="jdbc:oracle:thin:@ofss-mum-3722.snbomprshared1.gbucdsint02bom.oraclevcn.com:1521/OPDSPDB" 
+  -Dplato_username="plato" 
+  -Dplato_password="$PLATO_DB_PASSWORD" 
+  -Dplatoaif_AIFAGENTCORE_db_driver=oracle.jdbc.OracleDriver 
+  -Dplatoaif_AIFAGENTCORE_db_url="jdbc:oracle:thin:@ofss-mum-3722.snbomprshared1.gbucdsint02bom.oraclevcn.com:1521/OPDSPDB" 
+  -Dplatoaif_AIFAGENTCORE_db_username="platoaif" 
+  -Dplatoaif_AIFAGENTCORE_db_password="$PLATOAIF_DB_PASSWORD" 
+  -Daif.llm.local.host="ofss-mum-2003.snbomprshared1.gbucdsint02bom.oraclevcn.com" 
+  -Daif.llm.local.port=60050 
+  -Dplato-services-eureka-uri="" 
+  -Dregister-with-eureka=true 
+  -Dfetch-registry=true 
+  -Deureka.instance.hostname="ofss-mum-2003.snbomprshared1.gbucdsint02bom.oraclevcn.com" 
+  -Deureka.instance.instance-id="ofss-mum-2003.snbomprshared1.gbucdsint02bom.oraclevcn.com:aif-agent-core-services:60084" 
+  -Deureka.instance.nonSecurePort=60084 
+  -Dmanagement.endpoints.web.exposure.include=health,info,prometheus 
+  -Dplato.service.logging.path="$LOG_DIR" 
+  -Dplato.service.logging.appender=STDOUT 
+  -Dplato.service.logging.level=INFO 
+  -jar "$JAR" \
+"$LOG_DIR/aif-agent-core-services.log" 2>&1 &
+
+
+
+
+
+
+Show more
+
+Aug 10, 11:08 AM
+
+
+
+
+
+
+For serverInfoFor5239, update the application host to ofss-mum-3648, Eureka to primary server ofss-mum-5239, and databases to ofss-mum-3606:1521/PDBOPDS.
+Use these adjusted settings.
+nohup /scratch/software/jdk-25.0.3/bin/java \
+  -Duser.home=/scratch/ofssobp \
+  -Ddeploy.environment=DEV \
+  -Dserver.port=60050 \
+  -Dspring.application.name=aif-llm-service \
+  -DappId=AIFLLM \
+  -Dplato.jndi.lookup=false \
+  -Dplato-services-eureka-uri='http://ofss-mum-5239.snbomprshared2.gbucdsint02bom.oraclevcn.com:8003/plato-discovery-service/eureka' \
+  -Deureka.client.serviceUrl.defaultZone='http://ofss-mum-5239.snbomprshared2.gbucdsint02bom.oraclevcn.com:8003/plato-discovery-service/eureka' \
+  -Deureka.instance.hostname='ofss-mum-3648.snbomprshared1.gbucdsint02bom.oraclevcn.com' \
+  -Deureka.instance.instance-id='ofss-mum-3648.snbomprshared1.gbucdsint02bom.oraclevcn.com:aif-llm-service:60050' \
+  -Deureka.instance.nonSecurePort=60050 \
+  -Dspring.ai.oci.genai.authentication.config-file=/scratch/ofssobp/.oci/config \
+  -Dspring.ai.oci.genai.authentication.configFile=/scratch/ofssobp/.oci/config \
+  -DOCI_CONFIG_FILE=/scratch/ofssobp/.oci/config \
+  -Dplato.service.logging.path=/scratch/work_area/logs/aif-llm-service \
+  -Dplato.service.logging.appender=STDOUT \
+  -Dplato.service.logging.level=INFO \
+  -jar /scratch/obma_installer/deployables/apps/snapshot/aif-llm-service-snapshot.jar \
+  > /scratch/work_area/logs/aif-llm-service/aif-llm-service.log 2>&1 &
+JAVA_BIN=/scratch/software/jdk-25.0.3/bin/java
+JAR=/scratch/obma_installer/deployables/apps/snapshot/aif-agent-core-services-snapshot.jar
+LOG_DIR=/scratch/work_area/logs/aif-agent-core-services
+
+mkdir -p "$LOG_DIR"
+
+nohup "$JAVA_BIN" \
+  -Duser.home=/scratch/ofssobp \
+  -Ddeploy.environment=cloud \
+  -Denvironment.name=CICDCT \
+  -Dserver.port=60084 \
+  -Dspring.application.name=aif-agent-core-services \
+  -Dspring.main.allow-circular-references=true \
+  -Dplato.jndi.lookup=false \
+  -DappId=AIFAGENTCORE \
+  -Dplato_db_driver=oracle.jdbc.OracleDriver \
+  -Dplato_db_url='jdbc:oracle:thin:@ofss-mum-3606.snbomprshared1.gbucdsint02bom.oraclevcn.com:1521/PDBOPDS' \
+  -Dplato_username=plato \
+  -Dplato_password="$PLATO_DB_PASSWORD" \
+  -Dplatoaif_AIFAGENTCORE_db_driver=oracle.jdbc.OracleDriver \
+  -Dplatoaif_AIFAGENTCORE_db_url='jdbc:oracle:thin:@ofss-mum-3606.snbomprshared1.gbucdsint02bom.oraclevcn.com:1521/PDBOPDS' \
+  -Dplatoaif_AIFAGENTCORE_db_username=platoaif \
+  -Dplatoaif_AIFAGENTCORE_db_password="$PLATOAIF_DB_PASSWORD" \
+  -Daif.llm.local.host='ofss-mum-3648.snbomprshared1.gbucdsint02bom.oraclevcn.com' \
+  -Daif.llm.local.port=60050 \
+  -Dplato-services-eureka-uri='http://ofss-mum-5239.snbomprshared2.gbucdsint02bom.oraclevcn.com:8003/plato-discovery-service/eureka' \
+  -Dregister-with-eureka=true \
+  -Dfetch-registry=true \
+  -Deureka.instance.hostname='ofss-mum-3648.snbomprshared1.gbucdsint02bom.oraclevcn.com' \
+  -Deureka.instance.instance-id='ofss-mum-3648.snbomprshared1.gbucdsint02bom.oraclevcn.com:aif-agent-core-services:60084' \
+  -Deureka.instance.nonSecurePort=60084 \
+  -Dmanagement.endpoints.web.exposure.include=health,info,prometheus \
+  -Dplato.service.logging.path="$LOG_DIR" \
+  -Dplato.service.logging.appender=STDOUT \
+  -Dplato.service.logging.level=INFO \
+  -jar "$JAR" > "$LOG_DIR/aif-agent-core-services.log" 2>&1 &
+Before starting the LLM service, ensure port 60050 is free on ofss-mum-3648. Also export the password variables securely before running the second command; do not put real passwords directly in shell history or command lines.
+
+
+Aug 10, 11:09 AM
+
+
+
+
+
+
+
+
+ wget --user=nagarajan.subramani@oracle.com  --password=cmVmdGtuOjAxOjE4MDY0NzA4ODM6eDViMmFuNUVmejR4QWY0d0NXUWZMam9meGRi  https://artifacthub-iad.oci.oraclecorp.com/fsgbubanking-gradle-dev-local/dev/obma/aif/26_1_0/services/aif-llm-service/snapshot/aif-llm-service-snapshot.jar
+--2026-08-10 11:26:45--  https://artifacthub-iad.oci.oraclecorp.com/fsgbubanking-gradle-dev-local/dev/obma/aif/26_1_0/services/aif-llm-service/snapshot/aif-llm-service-snapshot.jar
+Resolving www-proxy.us.oracle.com (www-proxy.us.oracle.com)... 10.68.69.53, 2606:b400:400:7482::10
+Connecting to www-proxy.us.oracle.com (www-proxy.us.oracle.com)|10.68.69.53|:80...
+connected.
+ERROR: The certificate of ‘artifacthub-iad.oci.oraclecorp.com’ is not trusted.
+ERROR: The certificate of ‘artifacthub-iad.oci.oraclecorp.com’ hasn't got a known issuer.
+ERROR: The certificate of ‘artifacthub-iad.oci.oraclecorp.com’ has expired.
+The certificate has expired
+
+
+
+
+
+
+
+Aug 10, 11:27 AM
+
+
+
+
+
+
+This is a TLS certificate validation failure—not a wget authentication problem. The message specifically says the presented certificate is expired.
+First, verify the server time is correct:
+date
+timedatectl status
+If the time is incorrect, fix NTP/time synchronization and retry. If time is correct, inspect the certificate validity:
+openssl s_client \
+  -proxy www-proxy.us.oracle.com:80 \
+  -connect artifacthub-iad.oci.oraclecorp.com:443 \
+  -servername artifacthub-iad.oci.oraclecorp.com </dev/null 2>/dev/null \
+  | openssl x509 -noout -issuer -subject -dates
+If notAfter is before the current date, the ArtifactHub/server certificate must be renewed by its administrators. Installing a CA certificate will not fix an actually expired server certificate.
+If the certificate is valid but the issue is only a missing corporate CA, update the server CA trust store with the Oracle corporate root/intermediate certificate, then run the appropriate command for your OS:
+# RHEL / Oracle Linux
+update-ca-trust extract
+
+# Ubuntu / Debian
+update-ca-certificates
+A short-term diagnostic-only bypass is:
+wget --no-check-certificate --user='your-user' \
+  --password='your-token' \
+  'https://artifacthub-iad.oci.oraclecorp.com/.../aif-llm-service-snapshot.jar'
+Do not use --no-check-certificate as the permanent deployment solution, since it disables server identity verification.
+Also, the credential/token in your pasted command is exposed. Revoke or rotate it, and use a protected credentials mechanism (for example, a restricted .netrc file or CI secret) rather than putting it directly on the command line.
+
+
+Aug 10, 11:27 AM
+
+
+
+
+
+
+
+
+wget --no-check-certificate --user=nagarajan.subramani@oracle.com  --password=cmVmdGtuOjAxOjE4MDY0NzA4ODM6eDViMmFuNUVmejR4QWY0d0NXUWZMam9meGRi  https://artifacthub-iad.oci.oraclecorp.com/fsgbubanking-gradle-dev-local/dev/obma/aif/26_1_0/services/aif-llm-service/snapshot/aif-llm-service-snapshot.jar
+--2026-08-10 11:33:03--  https://artifacthub-iad.oci.oraclecorp.com/fsgbubanking-gradle-dev-local/dev/obma/aif/26_1_0/services/aif-llm-service/snapshot/aif-llm-service-snapshot.jar
+Resolving www-proxy.us.oracle.com (www-proxy.us.oracle.com)... 10.68.69.53, 2606:b400:400:7482::10
+Connecting to www-proxy.us.oracle.com (www-proxy.us.oracle.com)|10.68.69.53|:80... connected.
+WARNING: The certificate of ‘artifacthub-iad.oci.oraclecorp.com’ is not trusted.
+WARNING: The certificate of ‘artifacthub-iad.oci.oraclecorp.com’ hasn't got a known issuer.
+WARNING: The certificate of ‘artifacthub-iad.oci.oraclecorp.com’ has expired.
+The certificate has expired
+Proxy request sent, awaiting response... 502 notresolvable
+2026-08-10 11:33:04 ERROR 502: notresolvable.
+
+
+
+
+
+Show more
+
+Aug 10, 11:33 AM
+
+
+
+
+
+
+--no-check-certificate bypassed TLS validation. The current failure is different: the corporate proxy cannot resolve or reach artifacthub-iad.oci.oraclecorp.com (502 notresolvable).
+Check whether the host resolves directly from that server:
+getent hosts artifacthub-iad.oci.oraclecorp.com
+Then try bypassing the proxy, which is often needed for internal ArtifactHub hosts:
+wget --no-proxy --no-check-certificate \
+  --user='your-user' \
+  --password='your-new-token' \
+  'https://artifacthub-iad.oci.oraclecorp.com/fsgbubanking-gradle-dev-local/dev/obma/aif/26_1_0/services/aif-llm-service/snapshot/aif-llm-service-snapshot.jar'
+If direct access works, make it explicit for this host:
+export no_proxy='artifacthub-iad.oci.oraclecorp.com'
+export NO_PROXY="$no_proxy"
+If getent cannot resolve it, or --no-proxy fails to connect, this server lacks the required DNS/network route. Raise it with the network/proxy team, including:
+- Source host
+- Target: artifacthub-iad.oci.oraclecorp.com:443
+- Error: 502 notresolvable via www-proxy.us.oracle.com
+Rotate the token you pasted before retrying.
+
+
+Aug 10, 11:33 AM
+
+
+
+
+
+
+
+
+jar service 
+previously they are in cmc plato domain
+now they are in aif domain 
+stop plato llm services using port 60050 of respective AI server
+the get jar from aif IAD url for aif-llm-service-snapshot
+deploy it 
+aif-agent-core-services-snapshot
+new service . no reference to any existing service
+deploy it in a new additional port 60084
+both these servces are using latest jar versions i.e we deployed using java25 version
+frame the sentaces into respective steps
+
+
+
+
+
+
+
+Aug 10, 11:36 AM
+
+
+
+
+
+
+1. The JAR services were previously deployed in the CMC Plato domain. They must now be deployed in the AIF domain.
+2. On each respective AI server, identify and stop the existing Plato LLM service running on port 60050.
+3. Download the latest aif-llm-service-snapshot.jar from the AIF IAD ArtifactHub URL.
+4. Deploy and start aif-llm-service-snapshot.jar on port 60050, using Java 25.
+5. Download the latest aif-agent-core-services-snapshot.jar from the AIF IAD ArtifactHub URL.
+6. aif-agent-core-services is a new service and has no dependency on, or replacement for, an existing service.
+7. Deploy and start aif-agent-core-services-snapshot.jar on the new additional port 60084, using Java 25.
+8. Verify that both services start successfully, register with Eureka, and are reachable on their respective ports.
+
+
+Aug 10, 11:36 AM
+
+
+
+
+
+
+
+
+service wise group the sentances 
+
+
+
+
+
+
+
+Aug 10, 11:39 AM
+
+
+
+
+
+
+AIF LLM Service (aif-llm-service-snapshot.jar)
+1. This service was previously deployed in the CMC Plato domain and must now be deployed in the AIF domain.
+2. On the respective AI server, stop the existing Plato LLM service using port 60050.
+3. Download the latest aif-llm-service-snapshot.jar from the AIF IAD ArtifactHub URL.
+4. Deploy and start the service on port 60050 using Java 25.
+5. Verify that the service starts successfully, registers with Eureka, and is reachable on port 60050.
+AIF Agent Core Services (aif-agent-core-services-snapshot.jar)
+1. This is a new AIF-domain service and has no dependency on, or replacement for, an existing service.
+2. Download the latest aif-agent-core-services-snapshot.jar from the AIF IAD ArtifactHub URL.
+3. Deploy and start the service on the new additional port 60084 using Java 25.
+4. Verify that the service starts successfully, registers with Eureka, and is reachable on port 60084.

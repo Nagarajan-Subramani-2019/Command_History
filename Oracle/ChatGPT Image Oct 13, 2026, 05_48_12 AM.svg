@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1200" viewBox="0 0 1700 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Legacy versus adopted AIF Java service architecture</title>
+  <desc id="desc">Comparison of legacy Java service JARs and the 26.1 AIF service consolidation architecture, including agent core, standalone services, database MCP, and optional ref MCP client.</desc>
+  <defs>
+    <linearGradient id="oldHeader" x1="0" x2="1"><stop stop-color="#7c2d12"/><stop offset="1" stop-color="#ea580c"/></linearGradient>
+    <linearGradient id="newHeader" x1="0" x2="1"><stop stop-color="#14532d"/><stop offset="1" stop-color="#16a34a"/></linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#0f172a" flood-opacity=".14"/></filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3z" fill="#64748b"/></marker>
+  </defs>
+  <rect width="1700" height="1200" fill="#f8fafc"/>
+  <text x="850" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#0f172a">Java Services: Legacy Deployment vs AIF 26.1 Consolidation</text>
+  <text x="850" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#475569">Source-service APIs move to Agent Core; selected services become renamed standalone artifacts</text>
+  <g filter="url(#shadow)">
+    <rect x="55" y="140" width="710" height="930" rx="22" fill="#fff"/>
+    <rect x="55" y="140" width="710" height="94" rx="22" fill="url(#oldHeader)"/>
+    <rect x="55" y="210" width="710" height="24" fill="url(#oldHeader)"/>
+    <rect x="935" y="140" width="710" height="930" rx="22" fill="#fff"/>
+    <rect x="935" y="140" width="710" height="94" rx="22" fill="url(#newHeader)"/>
+    <rect x="935" y="210" width="710" height="24" fill="url(#newHeader)"/>
+  </g>
+  <g font-family="Arial, sans-serif">
+    <text x="410" y="181" text-anchor="middle" font-size="26" font-weight="700" fill="#fff">OLD: Legacy Java JAR Deployment</text>
+    <text x="410" y="208" text-anchor="middle" font-size="16" fill="#ffedd5">Separate deploy/start steps, service-specific ports and configuration</text>
+    <text x="1290" y="181" text-anchor="middle" font-size="26" font-weight="700" fill="#fff">NEW: AIF 26.1 Service Model</text>
+    <text x="1290" y="208" text-anchor="middle" font-size="16" fill="#dcfce7">Consolidated Agent Core plus renamed standalone services</text>
+
+    <text x="105" y="285" font-size="18" font-weight="700" fill="#9a3412">Legacy pipeline mechanics</text>
+    <rect x="105" y="305" width="610" height="94" rx="12" fill="#fff7ed" stroke="#fed7aa"/>
+    <text x="133" y="340" font-size="18" fill="#0f172a">Resolve environment → select Jenkins stages</text>
+    <text x="133" y="368" font-size="16" fill="#334155">Stop Java processes by port → optionally prepare OCI → start JAR</text>
+    <text x="133" y="391" font-size="14" fill="#64748b">Each service has independent DB dparams, Eureka details, and log file</text>
+    <text x="105" y="465" font-size="18" font-weight="700" fill="#9a3412">Services explicitly started by the old job</text>
+    <rect x="105" y="485" width="610" height="470" rx="12" fill="#fffaf5" stroke="#fed7aa"/>
+    <text x="135" y="528" font-size="20" font-weight="700" fill="#0f172a">plato-llm-service</text>
+    <text x="135" y="555" font-size="16" fill="#334155">LLM API • port 60050</text>
+    <line x1="130" y1="577" x2="690" y2="577" stroke="#fed7aa"/>
+    <text x="135" y="620" font-size="20" font-weight="700" fill="#0f172a">plato-mcp-registry</text>
+    <text x="135" y="647" font-size="16" fill="#334155">MCP registry API • port 60082</text>
+    <line x1="130" y1="669" x2="690" y2="669" stroke="#fed7aa"/>
+    <text x="135" y="712" font-size="19" font-weight="700" fill="#0f172a">financial-services-enterprise-mcp-gateway</text>
+    <text x="135" y="739" font-size="16" fill="#334155">Metadata-based MCP surface • port 60083</text>
+    <line x1="130" y1="761" x2="690" y2="761" stroke="#fed7aa"/>
+    <text x="135" y="804" font-size="20" font-weight="700" fill="#0f172a">cpo-inquiry-agent</text>
+    <text x="135" y="831" font-size="16" fill="#334155">AIF-enabled consumer • port 60081</text>
+    <text x="135" y="872" font-size="15" fill="#64748b">The supplied adoption guide does not declare a direct replacement</text>
+    <text x="135" y="897" font-size="15" fill="#64748b">for this service; validate its route separately during adoption.</text>
+
+    <text x="985" y="285" font-size="18" font-weight="700" fill="#166534">Shared AIF foundation</text>
+    <rect x="985" y="305" width="610" height="117" rx="12" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <text x="1013" y="340" font-size="18" fill="#0f172a">Cloud-only runtime • Service discovery in OBMA mode</text>
+    <text x="1013" y="368" font-size="16" fill="#334155">AIFAGENTCORE ledger row + jdbc/AIFAGENTCORE datasource</text>
+    <text x="1013" y="396" font-size="16" fill="#334155">Retain old database tables for rollback / blue-green safety</text>
+    <text x="985" y="487" font-size="18" font-weight="700" fill="#166534">Consolidated runtime: aif-agent-core-services</text>
+    <rect x="985" y="507" width="610" height="272" rx="12" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <text x="1013" y="542" font-size="19" font-weight="700" fill="#0f172a">appId AIFAGENTCORE</text>
+    <text x="1013" y="572" font-size="16" fill="#334155">• Config provider / document config / use-case invocation</text>
+    <text x="1013" y="602" font-size="16" fill="#334155">• AI utility and database utility APIs</text>
+    <text x="1013" y="632" font-size="16" fill="#334155">• MCP registry → /aif-mcp-registry</text>
+    <text x="1013" y="662" font-size="16" fill="#334155">• Metadata MCP → /aif-metadata-based-mcp-server</text>
+    <text x="1013" y="707" font-size="15" fill="#64748b">OBMA starts it after LLM; it requires PLATO and AIFAGENTCORE dparams.</text>
+    <text x="1013" y="734" font-size="15" fill="#64748b">Use direct endpoints only in non-OBMA mode, with Eureka disabled.</text>
+    <text x="985" y="848" font-size="18" font-weight="700" fill="#166534">Renamed / supporting services</text>
+    <rect x="985" y="868" width="610" height="153" rx="12" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <text x="1013" y="902" font-size="19" font-weight="700" fill="#0f172a">aif-llm-service — appId AIFLLM</text>
+    <text x="1013" y="929" font-size="16" fill="#334155">Renamed from plato-llm-service • starts before Agent Core</text>
+    <text x="1013" y="958" font-size="19" font-weight="700" fill="#0f172a">aif-database-mcp-server — appId AIFDATABASEMCP</text>
+    <text x="1013" y="985" font-size="16" fill="#334155">Renamed from plato-database-mcp-server • required for SQLcl tools</text>
+  </g>
+  <g font-family="Arial, sans-serif">
+    <line x1="740" y1="540" x2="960" y2="910" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="842" y="700" text-anchor="middle" font-size="14" fill="#475569">renamed</text>
+    <line x1="740" y1="630" x2="960" y2="642" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="850" y="620" text-anchor="middle" font-size="14" fill="#475569">consolidated</text>
+    <line x1="740" y1="723" x2="960" y2="672" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="850" y="712" text-anchor="middle" font-size="14" fill="#475569">consolidated</text>
+    <rect x="260" y="1120" width="1180" height="42" rx="21" fill="#e2e8f0"/>
+    <text x="850" y="1148" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">Startup order: discovery → aif-llm-service → aif-agent-core-services → optional ref-mcp-client / database MCP</text>
+  </g>
+</svg>

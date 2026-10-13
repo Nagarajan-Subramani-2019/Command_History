@@ -1,0 +1,274 @@
+/\\ / ___'_ __ _ _(_)_ __ __ _ \ \ \ \ ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ …
+
+
+
+
+Worked for 30s
+
+
+
+The current failure is not port 8003. cmc-obcbs-services binds successfully to port 8062, then stops because a required configuration property is missing:
+Could not resolve placeholder 'plato.services.rule.uri'
+It is needed by:
+baseRulesClient
+cbs.rulesServiceUri -> ${plato.services.rule.uri}
+Also, Config Server reports:
+None of labels [jdbc] found
+So the jdbc configuration source does not contain this property.
+Add the property in Config Server configuration for cmc-obcbs-services under the active profile/config source:
+plato.services.rule.uri=http://<rules-service-host>:<rules-service-port>/<rules-service-context>
+Use the actual Rules Service URL—do not use the discovery-service URL unless that is truly where the Rules Service runs.
+For a temporary startup test, add it in the target Tomcat’s startup environment:
+export CATALINA_OPTS="$CATALINA_OPTS \
+  -Dplato.services.rule.uri=http://<rules-service-host>:<rules-service-port>/<rules-service-context>"
+Then restart tomcat_cmc_obcbs_services.
+The service will continue failing until that property is supplied. The 8062 connector starts, then Tomcat shuts it down because Spring initialization fails.
+
+
+Aug 21, 6:24 PM
+
+
+
+
+
+
+
+
+http://ofss-mum-3607.snbomprshared1.gbucdsint02bom.oraclevcn.com:8003/plato-discovery-service/
+
+
+
+
+
+
+
+Aug 21, 6:27 PM
+
+
+
+
+
+
+That URL is the Discovery/Eureka Service URL:
+http://ofss-mum-3607.snbomprshared1.gbucdsint02bom.oraclevcn.com:8003/plato-discovery-service/
+It is not the missing plato.services.rule.uri value for cmc-obcbs-services.
+Your latest log is for cmc-obcbs-services on port 8062; it does not start or host discovery service on 8003.
+To verify whether Discovery Service is running on the server:
+ss -ltnp | grep :8003
+curl -i http://localhost:8003/plato-discovery-service/eureka/apps
+If port 8003 has no listener, start the separate plato-discovery-service Tomcat deployment. Do not use the CMC OBCBS Tomcat for it.
+
+Web previewWebsiteOpenOpen in
+
+
+
+
+
+
+Aug 21, 6:28 PM
+
+
+
+
+
+
+
+
+
+
+
+
+9817	cmc-obcbs-services	jdbc	jdbc	cbs.rulesServiceUri	https://ofss-mum-3607.snbomprshared1.gbucdsint02bom.oraclevcn.com:8002/rule-service
+
+
+
+
+
+
+
+Aug 21, 6:29 PM
+
+
+
+
+
+
+The database value is incorrect for the Rules Service.
+Your current value points to Config Service:
+https://...:8002/rule-service
+But Eureka shows the actual running Rules Service is:
+PLATO-RULE-SERVICE — UP — port 8014
+Add/correct the missing property used by the application:
+plato.services.rule.uri=http://ofss-mum-3607.snbomprshared1.gbucdsint02bom.oraclevcn.com:8014/plato-rule-service
+Then keep the alias property as:
+cbs.rulesServiceUri=${plato.services.rule.uri}
+The important corrections are:
+- Port: 8014, not 8002
+- Context: /plato-rule-service, not /rule-service
+- The application explicitly requires plato.services.rule.uri; only setting cbs.rulesServiceUri is not enough when it resolves through that missing placeholder.
+After updating Config Service/DB configuration, restart tomcat_cmc_obcbs_services.
+
+
+Aug 21, 6:30 PM
+
+
+
+
+
+
+
+
+9817	cmc-obcbs-services	jdbc	jdbc	cbs.rulesServiceUri	https://ofss-mum-3607.snbomprshared1.gbucdsint02bom.oraclevcn.com:8002/rule-service
+update query        update plato.properties
+ID APPLICATION
+
+
+
+
+
+
+
+Aug 21, 6:31 PM
+
+
+
+
+
+
+UPDATE plato.properties
+SET value = 'http://ofss-mum-3607.snbomprshared1.gbucdsint02bom.oraclevcn.com:8014/plato-rule-service'
+WHERE id = 9817
+  AND application = 'cmc-obcbs-services'
+  AND profile = 'jdbc'
+  AND label = 'jdbc'
+  AND key = 'cbs.rulesServiceUri';
+
+COMMIT;
+This changes the Rules Service URL from Config Service port 8002 to the registered PLATO-RULE-SERVICE endpoint on port 8014.
+
+
+Aug 21, 6:32 PM
+
+
+
+
+
+
+
+
+13:02:54,531 |-INFO in org.springframework.boot.logging.logback.SpringBootJoran…
+
+
+
+
+Worked for 30s
+
+
+
+The update is still not reaching the application.
+The log is unchanged:
+Could not locate PropertySource: None of labels [jdbc] found
+Could not resolve placeholder 'plato.services.rule.uri'
+So cmc-obcbs-services is not receiving the jdbc configuration source at all. Updating row 9817 alone cannot fix startup until the Config Server label issue is corrected.
+First verify Config Server output:
+curl -s \
+'http://ofss-mum-3607.snbomprshared1.gbucdsint02bom.oraclevcn.com:8001/cmc-obcbs-services/kafka,jdbc/jdbc'
+It must return a property source containing the rule URI. If it reports label-not-found, either:
+- create/configure the jdbc label in Config Server, or
+- change the application’s configured Config Server label to the existing label.
+Once the label is available, ensure this key exists in the property source:
+plato.services.rule.uri = http://ofss-mum-3607.snbomprshared1.gbucdsint02bom.oraclevcn.com:8014/plato-rule-service
+The direct missing key is plato.services.rule.uri, not only cbs.rulesServiceUri. Restart cmc-obcbs-services only after the Config Server endpoint returns that property.
+
+
+Aug 21, 6:33 PM
+
+
+
+
+
+
+
+
+catalina.out
+
+is the label jdbc loaded good here
+
+
+
+
+
+
+
+Aug 21, 7:05 PM
+
+
+
+
+
+
+Worked for 27s
+
+
+
+No—this file does not prove that the Config Server jdbc label loaded.
+It is for a different service/environment:
+cpo-pricing-services
+ofss-mum-2108
+PDBCLEANUP2
+The jdbc messages in it are Oracle database connections, for example:
+Connected: jdbc:oracle:thin:@.../PDBCLEANUP2
+That is unrelated to Spring Config Server label jdbc.
+For a successful jdbc configuration-label load in cmc-obcbs-services, the log should contain Config Client messages showing a returned property source, and must not contain:
+Could not locate PropertySource: None of labels [jdbc] found
+The latest CMC OBCBS log still has that warning, so jdbc is not loading there.
+
+
+Aug 21, 7:05 PM
+
+
+
+
+
+
+
+
+from_36-07_catalina.out
+
+check here
+
+
+
+
+
+
+
+Aug 21, 7:06 PM
+
+
+
+
+
+
+Worked for 38s
+
+
+
+This cmc-opds-services log is healthy:
+Starting ProtocolHandler ["http-nio-8052"]
+Starting ProtocolHandler ["https-jsse-nio-8443"]
+Server startup in [35346] milliseconds
+Its Oracle JDBC connection also works against OPDSPDB.
+Most importantly, its Config Server setting is:
+-Dspring.cloud.config.uri=http://ofss-mum-3607...:8001/config-service
+Your failing cmc-obcbs-services log fetches configuration from only:
+http://ofss-mum-3607...:8001
+It is missing /config-service, which explains the None of labels [jdbc] found problem.
+Add this to the cmc-obcbs-services Tomcat CATALINA_OPTS:
+-Dspring.cloud.config.uri=http://ofss-mum-3607.snbomprshared1.gbucdsint02bom.oraclevcn.com:8001/config-service
+Keep this separate setting too if used:
+-Dplato.services.config.uri=http://ofss-mum-3607.snbomprshared1.gbucdsint02bom.oraclevcn.com:8001
+Then restart tomcat_cmc_obcbs_services.
+
+
+Aug

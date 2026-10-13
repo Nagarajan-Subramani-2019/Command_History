@@ -634,10 +634,14 @@ cp /home/nagarajan/TOMCAT_SOFTWARE/apache-tomcat-11.0.26_0/bin/$i /home/nagaraja
 ls -ltr /home/nagarajan/TOMCAT_SOFTWARE/apache-tomcat-11.0.26_0/bin/$i /home/nagarajan/TOMCAT_SOFTWARE/apache-tomcat-11.0.26-war-only/bin/$i
 done 
 
-cd /home/nagarajan/TOMCAT_SOFTWARE/apache-tomcat-11.0.26-war-only/bin
-nohup ./cataina.sh run & 
 
-ssh -N -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -L 127.0.0.1:8880:127.0.0.1:8080 nagarajan@192.168.0.123
+
+sudo firewall-cmd --zone=public --add-port=8880/tcp
+sudo firewall-cmd --permanent --zone=public --add-port=8880/tcp
+sudo firewall-cmd --zone=public --query-port=8880/tcp
+
+cd /home/nagarajan/TOMCAT_SOFTWARE/apache-tomcat-11.0.26-war-only/bin
+nohup ./catalina.sh run & 
 
 
 Jenkins WAR:
@@ -659,3 +663,7 @@ nagaraj+   31942   31579  4 20:03 pts/3    00:01:13 /usr/lib/jvm/jdk-25.0.4.1-or
 nagaraj+   33030   31579  0 20:29 pts/3    00:00:00 grep --color=auto -i java
 [nagarajan@localhost JENKINS_SOFTWARE]$
 
+
+
+install git
+=================

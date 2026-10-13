@@ -1,0 +1,291 @@
+KAFKA_CLUSTER_ID=$(bin/kafka-storage.sh random-uuid)
+Exception in thread "main" java.lang.NoSuchMethodError: 'com.fasterxml.jackson.core.JsonToken com.fasterxml.jackson.dataformat.yaml.YAMLParser._updateToken(com.fasterxml.jackson.core.JsonToken)'
+        at com.fasterxml.jackson.dataformat.yaml.YAMLParser.nextToken(YAMLParser.java:577)
+        at com.fasterxml.jackson.databind.ObjectMapper._readTreeAndClose(ObjectMapper.java:4934)
+        at com.fasterxml.jackson.databind.ObjectMapper.readTree(ObjectMapper.java:3260)
+        at org.apache.logging.log4j.core.config.json.JsonConfiguration.<init>(JsonConfiguration.java:64)
+        at org.apache.logging.log4j.core.config.yaml.YamlConfiguration.<init>(YamlConfiguration.java:33)
+        at org.apache.logging.log4j.core.config.yaml.YamlConfigurationFactory.getConfiguration(YamlConfigurationFactory.java:66)
+        at org.apache.logging.log4j.core.config.ConfigurationFactory$Factory.getConfiguration(ConfigurationFactory.java:499)
+        at org.apache.logging.log4j.core.config.ConfigurationFactory$Factory.getConfiguration(ConfigurationFactory.java:474)
+        at org.apache.logging.log4j.core.config.ConfigurationFactory$Factory.getConfiguration(ConfigurationFactory.java:398)
+        at org.apache.logging.log4j.core.config.ConfigurationFactory.getConfiguration(ConfigurationFactory.java:318)
+        at org.apache.logging.log4j.core.LoggerContext.reconfigure(LoggerContext.java:690)
+        at org.apache.logging.log4j.core.LoggerContext.reconfigure(LoggerContext.java:711)
+        at org.apache.logging.log4j.core.LoggerContext.start(LoggerContext.java:253)
+        at org.apache.logging.log4j.core.impl.Log4jContextFactory.getContext(Log4jContextFactory.java:155)
+        at org.apache.logging.log4j.core.impl.Log4jContextFactory.getContext(Log4jContextFactory.java:47)
+        at org.apache.logging.log4j.LogManager.getContext(LogManager.java:196)
+        at org.apache.logging.log4j.LogManager.getLogger(LogManager.java:599)
+        at org.apache.kafka.server.logger.LoggingController.<clinit>(LoggingController.java:34)
+        at kafka.utils.Log4jControllerRegistration$.<clinit>(Logging.scala:28)
+        at kafka.tools.StorageTool$.<clinit>(StorageTool.scala:40)
+        at kafka.tools.StorageTool.main(StorageTool.scala)
+[ofssobp@ofss-mum-3607 kafka_2.13-4.3.1]$
+
+
+
+
+
+Show more
+
+Aug 14, 4:52 PM
+
+
+
+
+
+
+This confirms the local kafka_2.13-4.3.1/libs classpath has incompatible Jackson JARs. jackson-dataformat-yaml is newer than the loaded jackson-core.
+The immediate workaround to generate the cluster ID without parsing Kafka’s YAML Log4j config is:
+cat >/tmp/kafka-log4j2.properties <<'EOF'
+status = error
+name = KafkaStorageTool
+EOF
+
+KAFKA_LOG4J_OPTS="-Dlog4j2.configurationFile=file:/tmp/kafka-log4j2.properties" \
+  bin/kafka-storage.sh random-uuid
+However, fix the JAR mismatch before starting Kafka. Run:
+ls -1 libs/jackson-*.jar
+All of these must be version-aligned from the same Kafka 4.3.1 distribution:
+jackson-core-...
+jackson-databind-...
+jackson-dataformat-yaml-...
+jackson-annotations-...
+If any Jackson JAR was copied from another Kafka folder, WebLogic, or another product, restore the complete libs/ directory from the original kafka_2.13-4.3.1 archive. Do not replace only one Jackson JAR—replace the complete matching Jackson set.
+
+
+Aug 14, 4:52 PM
+
+
+
+
+
+
+
+
+libs/jackson-annotations-2.21.jar
+libs/jackson-core-2.21.2.jar
+libs/jackson-databind-2.21.2.jar
+libs/jackson-dataformat-csv-2.21.2.jar
+libs/jackson-dataformat-yaml-2.21.2.jar
+libs/jackson-datatype-jdk8-2.21.2.jar
+libs/jackson-jakarta-rs-base-2.21.2.jar
+libs/jackson-jakarta-rs-json-provider-2.21.2.jar
+libs/jackson-module-blackbird-2.21.2.jar
+libs/jackson-module-jakarta-xmlbind-annotations-2.21.2.jar
+[ofssobp@ofss-mum-3607 kafka_2.13-4.3.1]$
+
+
+
+
+
+
+
+Aug 14, 4:53 PM
+
+
+
+
+
+
+Those JARs are correctly version-aligned, so do not replace them.
+The old/incompatible jackson-core is being loaded from outside this libs/ directory—most likely via CLASSPATH, JAVA_TOOL_OPTIONS, or a Java agent.
+Run this clean-environment test:
+env -u CLASSPATH -u JAVA_TOOL_OPTIONS -u JDK_JAVA_OPTIONS -u KAFKA_OPTS -u KAFKA_LOG4J_OPTS \
+  bin/kafka-storage.sh random-uuid
+If it works, find the conflicting setting:
+env | grep -E '^(CLASSPATH|JAVA_TOOL_OPTIONS|JDK_JAVA_OPTIONS|KAFKA_OPTS|KAFKA_LOG4J_OPTS)='
+If it still fails, identify the exact JAR being loaded:
+KAFKA_OPTS="-Xlog:class+load=info" \
+  bin/kafka-storage.sh random-uuid 2>&1 |
+  grep -E 'YAMLParser|ParserMinimalBase|jackson.core'
+The output will show source: file:... for the loaded classes. The jackson-core source must be:
+.../kafka_2.13-4.3.1/libs/jackson-core-2.21.2.jar
+If it points to a WebLogic, OBMA Java, or older Kafka JAR, remove that source from the inherited runtime classpath.
+
+
+Aug 14, 4:54 PM
+
+
+
+
+
+
+
+
+env -u CLASSPATH -u JAVA_TOOL_OPTIONS -u JDK_JAVA_OPTIONS -u KAFKA_OPTS -u KAFKA_LOG4J_OPTS \
+  bin/kafka-storage.sh random-uuid
+8CmOViadTnGMse3kpy4AhA
+[ofssobp@ofss-mum-3607 kafka_2.13-4.3.1]$  bin/kafka-storage.sh random-uuid
+Exception in thread "main" java.lang.NoSuchMethodError: 'com.fasterxml.jackson.core.JsonToken com.fasterxml.jackson.dataformat.yaml.YAMLParser._updateToken(com.fasterxml.jackson.core.JsonToken)'
+        at com.fasterxml.jackson.dataformat.yaml.YAMLParser.nextToken(YAMLParser.java:577)
+        at com.fasterxml.jackson.databind.ObjectMapper._readTreeAndClose(ObjectMapper.java:4934)
+        at com.fasterxml.jackson.databind.ObjectMapper.readTree(ObjectMapper.java:3260)
+        at org.apache.logging.log4j.core.config.json.JsonConfiguration.<init>(JsonConfiguration.java:64)
+        at org.apache.logging.log4j.core.config.yaml.YamlConfiguration.<init>(YamlConfiguration.java:33)
+        at org.apache.logging.log4j.core.config.yaml.YamlConfigurationFactory.getConfiguration(YamlConfigurationFactory.java:66)
+        at org.apache.logging.log4j.core.config.ConfigurationFactory$Factory.getConfiguration(ConfigurationFactory.java:499)
+        at org.apache.logging.log4j.core.config.ConfigurationFactory$Factory.getConfiguration(ConfigurationFactory.java:474)
+        at org.apache.logging.log4j.core.config.ConfigurationFactory$Factory.getConfiguration(ConfigurationFactory.java:398)
+        at org.apache.logging.log4j.core.config.ConfigurationFactory.getConfiguration(ConfigurationFactory.java:318)
+        at org.apache.logging.log4j.core.LoggerContext.reconfigure(LoggerContext.java:690)
+        at org.apache.logging.log4j.core.LoggerContext.reconfigure(LoggerContext.java:711)
+        at org.apache.logging.log4j.core.LoggerContext.start(LoggerContext.java:253)
+        at org.apache.logging.log4j.core.impl.Log4jContextFactory.getContext(Log4jContextFactory.java:155)
+        at org.apache.logging.log4j.core.impl.Log4jContextFactory.getContext(Log4jContextFactory.java:47)
+        at org.apache.logging.log4j.LogManager.getContext(LogManager.java:196)
+        at org.apache.logging.log4j.LogManager.getLogger(LogManager.java:599)
+        at org.apache.kafka.server.logger.LoggingController.<clinit>(LoggingController.java:34)
+        at kafka.utils.Log4jControllerRegistration$.<clinit>(Logging.scala:28)
+        at kafka.tools.StorageTool$.<clinit>(StorageTool.scala:40)
+        at kafka.tools.StorageTool.main(StorageTool.scala)
+[ofssobp@ofss-mum-3607 kafka_2.13-4.3.1]$
+
+
+
+
+
+
+Show more
+
+Aug 14, 4:55 PM
+
+
+
+
+
+
+Confirmed: one of your shell environment variables injects the incompatible Jackson classpath. The Kafka 4.3.1 installation itself is fine.
+Use this cluster ID:
+export KAFKA_CLUSTER_ID=8CmOViadTnGMse3kpy4AhA
+For the current shell, clear the conflicting variables:
+unset CLASSPATH
+unset JAVA_TOOL_OPTIONS
+unset JDK_JAVA_OPTIONS
+unset KAFKA_OPTS
+unset KAFKA_LOG4J_OPTS
+Now this should work normally:
+bin/kafka-storage.sh random-uuid
+Find the bad setting before opening a new session:
+env | grep -E '^(CLASSPATH|JAVA_TOOL_OPTIONS|JDK_JAVA_OPTIONS|KAFKA_OPTS|KAFKA_LOG4J_OPTS)='
+Remove that setting from the relevant shell profile or startup script. The clean command succeeding proves the error is environmental, not Kafka/SSL-related.
+
+
+Aug 14, 4:55 PM
+
+
+
+
+
+
+
+
+frame the role sentancve
+           :GFALLON   roleCode:PRICING_ANALYST_ROLE  roleCode:PRICING_MANAGER_1_ROLE  roleCode:PRICING_MANAGER_2_ROLE   roleCode:PRODUCT_MANAGER_ROLE       roleCode:PPH_PRODUCT_ROLE       roleCode:PPH_PRICING_ROLE  roleCode:PRODUCT_MANAGER_1_ROLE  roleCode:PRODUCT_MANAGER_2_ROLE             roleCode:ADMIN_ROLE
+            :SONAMG   roleCode:PRICING_ANALYST_ROLE  roleCode:PRICING_MANAGER_1_ROLE  roleCode:PRICING_MANAGER_2_ROLE   roleCode:PRODUCT_MANAGER_ROLE       roleCode:PPH_PRODUCT_ROLE       roleCode:PPH_PRICING_ROLE  roleCode:PRODUCT_MANAGER_1_ROLE  roleCode:PRODUCT_MANAGER_2_ROLE             roleCode:ADMIN_ROLE
+
+
+
+
+
+
+
+Aug 14, 5:13 PM
+
+
+
+
+
+
+The users GFALLON and SONAMG are assigned the following roles: Pricing Analyst, Pricing Manager 1, Pricing Manager 2, Product Manager, PPH Product, PPH Pricing, Product Manager 1, Product Manager 2, and Administrator.
+
+
+Aug 14, 5:13 PM
+
+
+
+
+
+
+
+
+frame sentance with rolecode keywords
+
+
+
+
+
+
+
+Aug 14, 5:14 PM
+
+
+
+
+
+
+Users GFALLON and SONAMG have been assigned the following role codes: PRICING_ANALYST_ROLE, PRICING_MANAGER_1_ROLE, PRICING_MANAGER_2_ROLE, PRODUCT_MANAGER_ROLE, PPH_PRODUCT_ROLE, PPH_PRICING_ROLE, PRODUCT_MANAGER_1_ROLE, PRODUCT_MANAGER_2_ROLE, and ADMIN_ROLE.
+
+
+Aug 14, 5:14 PM
+
+
+
+
+
+
+
+
+Mon, Aug 17 at 11:27 AM
+bind => [ACTIVE] [EL Fine]: connection: 2026.08.17 05:57:09.063--ServerSession(…
+
+
+
+
+Worked for 22s
+
+
+
+cmc-opds-services fails because the required application ID is not configured:
+Could not resolve placeholder 'app.id' in value "${appId:${app.id}}"
+The application accepts either appId or app.id, but neither is available at startup.
+Add the required value in the service’s external application.properties / deployment properties:
+app.id=<your-application-id>
+Or set it as a Tomcat JVM property in bin/setenv.sh:
+export CATALINA_OPTS="$CATALINA_OPTS -Dapp.id=<your-application-id>"
+Then restart Tomcat.
+To locate the property source and confirm the expected value:
+grep -RInE 'app\.id|appId' \
+  /scratch/SuperBundle/tomcat/lifecycle/user_home/tomcat_for_3607/tomcat_cmc_opds_services \
+  2>/dev/null
+The Zipkin timeout, JDBC cleanup, scheduler thread, and ThreadLocal messages are shutdown side effects. The actual startup blocker is the missing app.id / appId property.
+
+
+Aug 17, 11:28 AM
+
+
+
+
+
+
+
+
+export CATALINA_OPTS="$CATALINA_OPTS -Dapp.id=CMNCORE"
+
+
+
+
+
+
+
+Aug 17, 11:31 AM
+
+
+
+
+
+
+Use this in Tomcat’s bin/setenv.sh file—not JavaScript:
+export CATALINA_OPTS="$CATALINA_OPTS -Dapp.id=CMNCORE"
+Then restart Tomcat. This provides the missing Spring property app.id.

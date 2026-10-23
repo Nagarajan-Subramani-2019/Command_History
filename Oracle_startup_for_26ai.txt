@@ -517,7 +517,7 @@ done
 
 
 su - oracle
-export ORACLE_SID=FREE
+export ORACLE_SID=FREEPDB1
 export ORACLE_HOME=/opt/oracle/product/26ai/dbhomeFree
 export PATH="$ORACLE_HOME/bin:$PATH"
 sqlplus / as sysdba
@@ -557,7 +557,7 @@ Creating Schema information:
 for i in UI_DATA_SCHEMA
 do
 echo $i
-export ORACLE_SID=FREE
+export ORACLE_SID=FREEPDB1
 export ORACLE_HOME=/opt/oracle/product/26ai/dbhomeFree
 export PATH="$ORACLE_HOME/bin:$PATH"
 sqlplus -s sys/welcome1@127.0.0.1:1521/FREEPDB1 as sysdba <<EOF

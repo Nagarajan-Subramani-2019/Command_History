@@ -1,2 +1,14 @@
+MongoDB server:
+https://www.mongodb.com/try/download/community
+Redhat cent os 10 x64
+
+after instlalation by linux UI 
+
 sudo systemctl start mongod.service
 sudo systemctl status mongod.service
+
+--------------------------------------------------
+MongoDB Atlas
+Downloaded from linux community centre 
+mongodb://localhost:27017/
+

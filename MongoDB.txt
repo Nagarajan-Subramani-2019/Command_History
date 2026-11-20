@@ -7,8 +7,30 @@ after instlalation by linux UI
 sudo systemctl start mongod.service
 sudo systemctl status mongod.service
 
+
+
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+
+
+Tunneling : ( client side - windows machine )
+===============
+ ssh -N -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -L 127.0.0.1:27018:127.0.0.1:27017 nagarajan@192.168.0.123
+
+debugging tunnelling port : ( at server side )
+==================================================
+ ss -lnt 'sport = :27017'
+
+
 --------------------------------------------------
 MongoDB Atlas
 Downloaded from linux community centre 
-mongodb://localhost:27017/
+
+
+connection string in Linux :
+mongodb://192.168.1.123:27017/
+
+connection string in windoes:
+mongodb://127.0.0.1:27018
 
